@@ -1,0 +1,86 @@
+{
+  "webCoffee": "1",
+  "info": {
+    "title": "Scenario do test login and do auth",
+    "version": "v1.0"
+  },
+  "resources": {
+    "auth": {
+      "path": "/Users/dekaulitz/projects/webcoffee/config/contracts/cofee.dologin.json",
+      "externalDocs": {
+        "description": "do auth",
+        "url": "http://localhost:8080/docs"
+      }
+    }
+  },
+  "specs": {
+    "doGenerateOTP": {
+      "def": {
+        "generalScript": {
+          "load": "/home/usr/fahmi/node.js",
+          "engine": "javascript",
+          "arguments": {
+            "$phoneNumber": {
+              "run": "randomPhoneNumber()"
+            }
+          }
+        }
+      },
+      "given": {
+        "$ref": "auth#paths#/v1/auth/dologin#post",
+        "statements": {
+          "parameters": {},
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "$ref": "auth#components#schemas#GENERATE_OTP",
+                "payload": {
+                  "type": "object",
+                  "properties": {
+                    "phoneNumber": {
+                      "name": "berak",
+                      "type": "string",
+                      "value": "085782390141"
+                    },
+                    "refId": {
+                      "type": "string",
+                      "value": "asdasd"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "expect": {
+        "httpCode": 200,
+        "parameters": {},
+        "content": {
+          "application/json": {
+            "schemaValidation": {
+              "$ref": "auth#components#schemas#OTP_RESPONSE",
+              "expectValue": {
+                "type": "object",
+                "properties": {
+                  "userId": {
+                    "type": "string",
+                    "value": "123321"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "runner": {
+    "env": {
+      "development": {
+        "url": "",
+        "description": ""
+      }
+    }
+  }
+}

@@ -1,0 +1,267 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "title": "Scenario do test login and do auth",
+    "version": "v1.0"
+  },
+  "servers": [
+    {
+      "url": "http://{host}/mocks/mocking/{testing_path}?path="
+    }
+  ],
+  "paths": {
+    "/v1/auth/genreateOtp": {
+      "post": {
+        "responses": {}
+      }
+    },
+    "/v1/auth/dologin": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/USER_LOGIN"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/USER_LOGIN_RESPONSE"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/auth/validateAuth": {
+      "get": {
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true
+          }
+        ],
+        "responses": {}
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "GENERATE_OTP": {
+        "type": "object",
+        "properties": {
+          "phoneNumber": {
+            "type": "string"
+          }
+        }
+      },
+      "OTP_RESPONSE": {
+        "type": "object",
+        "properties": {
+          "refId": {
+            "type": "string"
+          }
+        }
+      },
+      "USER_LOGIN": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "USER_LOGIN_RESPONSE": {
+        "type": "object",
+        "required": [
+          "token",
+          "id"
+        ],
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "x-coffee": {
+      "env": {
+        "$ref": "#/servers[0]"
+      },
+      "DOGENRATEOTP": {
+        "def": [
+          {
+            "load": "/home/usr/fahmi/node.js",
+            "prepareArguments": [
+              {
+                "run": "randomPhoneNumber()",
+                "as": "$phonenumber"
+              }
+            ]
+          }
+        ],
+        "arguments": {
+          "$phonenumber": {
+            "type": "string",
+            "value": "085782390141",
+            "from": {
+              "def": "$phonenumber"
+            }
+          }
+        },
+        "do": {
+          "$ref": "#/path/v1/generateOtp"
+        },
+        "given": {
+          "parameters": {},
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GENERATE_OTP",
+                  "value": {
+                    "phoneNumber": "$phoneNumber"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "expect": {
+          "content": {
+            "application/json": {
+              "httpCode": 200,
+              "response": {
+                "$ref": "#/components/schemas/USER_LOGIN_RESPONSE",
+                "expectValue": {
+                  "USER_LOGIN_RESPONSE.userId": {
+                    "type": "string",
+                    "value": "123321"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "DOLOGIN": {
+        "arguments": {
+          "schema": {
+            "properties": {
+              "$reffId": {
+                "type": "string"
+              },
+              "$username": {
+                "type": "string"
+              },
+              "$password": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "do": {
+          "$ref": "#/paths/v1/auth/dologin"
+        },
+        "given": {
+          "parameters": {
+            "Authorization": {
+              "set": "client-123",
+              "in": "header"
+            }
+          },
+          "requestbody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/USER_LOGIN",
+                  "value": {
+                    "otp": "arguments.$reffId",
+                    "username": "arguments.$username",
+                    "password": "arguments.$password"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "expect": {
+          "content": {
+            "application/json": {
+              "httpCode": 200,
+              "response": {
+                "$ref": "#/component/schemas/USER_LOGIN_RESPONSE"
+              }
+            }
+          }
+        }
+      },
+      "DOVALIDATE_AUTH": {
+        "before": {
+          "step": {
+            "DOOTP": {
+              "$ref": "#/component/x-coffee/DOGENRATEOTP",
+              "take": {
+                "reffId": "#/component/schemas/OTP_RESPONSE#$reffId"
+              }
+            },
+            "DOLOGIN": {
+              "arguments": {
+                "schema": {
+                  "properties": {
+                    "$reffId": {
+                      "type": "string",
+                      "$ref": "DOOTP.$reffId"
+                    }
+                  }
+                }
+              },
+              "$ref": "#/components/x-coffee/DOLOGIN#post",
+              "take": {
+                "token": "#/component/schemas/USER_LOGIN_RESPONSE#token"
+              }
+            }
+          }
+        },
+        "request": {
+          "$ref": "#/paths/v1/auth/validateAuth"
+        },
+        "given": {
+          "parameters": {
+            "Authorization": {
+              "set": {
+                "$ref": "DOLOGIN.$token"
+              },
+              "prefix": "Bearer ",
+              "in": "header"
+            }
+          }
+        },
+        "expect": {
+          "content": {
+            "application/json": {
+              "httpCode": 200,
+              "response": {
+                "$ref": "#/component/schemas/USER_LOGIN_RESPONSE"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
