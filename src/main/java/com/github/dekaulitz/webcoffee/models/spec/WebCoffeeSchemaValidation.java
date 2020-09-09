@@ -16,6 +16,7 @@ public class WebCoffeeSchemaValidation {
   private String $ref;
   private Schema schema;
   private Schema expectValue;
+  private String rawSchema;
 
   public String get$ref() {
     return $ref;

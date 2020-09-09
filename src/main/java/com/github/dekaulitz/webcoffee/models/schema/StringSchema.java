@@ -1,6 +1,6 @@
 package com.github.dekaulitz.webcoffee.models.schema;
 
-public class StringSchema extends io.swagger.v3.oas.models.media.StringSchema {
+public class StringSchema extends WebCoffeeSchema<String> {
 
   private String value;
 

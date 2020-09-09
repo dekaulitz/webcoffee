@@ -1,6 +1,8 @@
 package com.github.dekaulitz.webcoffee.models.spec;
 
-import java.util.Map;
+
+import com.github.dekaulitz.webcoffee.models.parameters.Parameter;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,7 +14,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class WebCoffeeStatements {
 
-  private Map<String, Object> parameters;
+  private List<Parameter> parameters;
   private WebCoffeeRequestBody requestBody;
 
 }

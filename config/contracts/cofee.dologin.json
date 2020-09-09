@@ -17,6 +17,12 @@
     },
     "/v1/auth/dologin": {
       "post": {
+        "parameters": [
+          {
+            "name": "asd",
+            "in": "query"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {

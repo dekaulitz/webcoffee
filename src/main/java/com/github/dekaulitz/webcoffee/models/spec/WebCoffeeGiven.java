@@ -13,6 +13,8 @@ import lombok.Setter;
 public class WebCoffeeGiven {
 
   private String $ref;
+  private String httpMethod;
+  private String pathEndpoint;
   private Operation operation;
   private WebCoffeeStatements statements;
 

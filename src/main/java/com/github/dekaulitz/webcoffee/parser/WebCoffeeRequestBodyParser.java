@@ -1,12 +1,12 @@
 package com.github.dekaulitz.webcoffee.parser;
 
-import static com.github.dekaulitz.webcoffee.helper.WebCoffeeHelper.extractString;
 import static com.github.dekaulitz.webcoffee.helper.WebCoffeeHelper.getNodeObject;
 import static com.github.dekaulitz.webcoffee.helper.WebCoffeeHelper.getNodeString;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.dekaulitz.webcoffee.errorHandler.WebCoffeeException;
+import com.github.dekaulitz.webcoffee.helper.WebCoffeeReference;
 import com.github.dekaulitz.webcoffee.models.WebCoffeeResources;
 import com.github.dekaulitz.webcoffee.models.spec.WebCoffeeRequestBodyContent;
 import io.swagger.v3.oas.models.media.Schema;
@@ -45,14 +45,11 @@ public class WebCoffeeRequestBodyParser {
 
   private Schema<?> getSchemaRequestBody(String $ref, Map<String, WebCoffeeResources> resources)
       throws WebCoffeeException {
-    String[] ref = extractString($ref);
-    if (ref.length != 4) {
-      throw new WebCoffeeException("invalid reference" + $ref);
-    }
-    WebCoffeeResources webCoffeeResource = resources.get(ref[0]);
+    WebCoffeeReference webCoffeeReference = WebCoffeeReference.getReference($ref);
+    WebCoffeeResources webCoffeeResource = resources.get(webCoffeeReference.getReferenceKey());
     if (webCoffeeResource == null) {
       throw new WebCoffeeException("invalid reference" + $ref);
     }
-    return webCoffeeResource.getOpenAPI().getComponents().getSchemas().get(ref[3]);
+    return webCoffeeResource.getOpenAPI().getComponents().getSchemas().get(webCoffeeReference.getSchema());
   }
 }

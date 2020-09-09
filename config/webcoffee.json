@@ -4,9 +4,19 @@
     "title": "Scenario do test login and do auth",
     "version": "v1.0"
   },
+  "environment": {
+    "production": {
+      "url": "",
+      "description": ""
+    },
+    "development": {
+      "url": "http://localhost:7070/mocks/mocking/5ee4ffa8fd95bc51f94c6d6a?path=",
+      "description": ""
+    }
+  },
   "resources": {
-    "auth": {
-      "path": "/Users/dekaulitz/projects/webcoffee/config/contracts/cofee.dologin.json",
+    "books": {
+      "path": "/Users/dekaulitz/projects/webcoffee/config/contracts/book.service.json",
       "externalDocs": {
         "description": "do auth",
         "url": "http://localhost:8080/docs"
@@ -14,37 +24,45 @@
     }
   },
   "specs": {
-    "doGenerateOTP": {
-      "def": {
-        "generalScript": {
-          "load": "/home/usr/fahmi/node.js",
-          "engine": "javascript",
-          "arguments": {
-            "$phoneNumber": {
-              "run": "randomPhoneNumber()"
-            }
-          }
-        }
-      },
+    "doLogin": {
+      "def": {},
       "given": {
-        "$ref": "auth#paths#/v1/auth/dologin#post",
+        "$ref": "books#paths#/books#post",
         "statements": {
-          "parameters": {},
+          "parameters": [
+            {
+              "name": "clientId",
+              "in": "headers",
+              "value": "something"
+            },
+            {
+              "name": "accept",
+              "in": "headers",
+              "schema": {
+                "type": "string"
+              },
+              "value": "application/json"
+            }
+          ],
           "requestBody": {
             "content": {
               "application/json": {
-                "$ref": "auth#components#schemas#GENERATE_OTP",
+                "$ref": "books#components#schemas#BOOKS_MODEL",
                 "payload": {
                   "type": "object",
                   "properties": {
-                    "phoneNumber": {
+                    "id": {
                       "name": "berak",
                       "type": "string",
-                      "value": "085782390141"
+                      "value": "123"
                     },
-                    "refId": {
+                    "title": {
                       "type": "string",
-                      "value": "asdasd"
+                      "value": "judul buku"
+                    },
+                    "author": {
+                      "type": "string",
+                      "value": "fahmi sulaiman"
                     }
                   }
                 }
@@ -55,20 +73,108 @@
       },
       "expect": {
         "httpCode": 200,
-        "parameters": {},
+        "parameters": [],
         "content": {
           "application/json": {
             "schemaValidation": {
-              "$ref": "auth#components#schemas#OTP_RESPONSE",
-              "expectValue": {
-                "type": "object",
-                "properties": {
-                  "userId": {
-                    "type": "string",
-                    "value": "123321"
+              "$ref": "books#components#schemas#BOOKS_MODEL",
+              "expectValue": {}
+            }
+          }
+        }
+      }
+    },
+    "postBooks": {
+      "def": {},
+      "given": {
+        "$ref": "books#paths#/books#post",
+        "statements": {
+          "parameters": [
+            {
+              "name": "clientId",
+              "in": "headers",
+              "value": "something"
+            },
+            {
+              "name": "accept",
+              "in": "headers",
+              "schema": {
+                "type": "string"
+              },
+              "value": "application/json"
+            }
+          ],
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "$ref": "books#components#schemas#BOOKS_MODEL",
+                "payload": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "name": "berak",
+                      "type": "string",
+                      "value": "123"
+                    },
+                    "title": {
+                      "type": "string",
+                      "value": "judul buku"
+                    },
+                    "author": {
+                      "type": "string",
+                      "value": "fahmi sulaiman"
+                    }
                   }
                 }
               }
+            }
+          }
+        }
+      },
+      "expect": {
+        "httpCode": 200,
+        "parameters": [],
+        "content": {
+          "application/json": {
+            "schemaValidation": {
+              "$ref": "books#components#schemas#BOOKS_MODEL",
+              "expectValue": {}
+            }
+          }
+        }
+      }
+    },
+    "getAllBooks": {
+      "def": {},
+      "given": {
+        "$ref": "books#paths#/books#get",
+        "statements": {
+          "parameters": [
+            {
+              "name": "clientId",
+              "in": "headers",
+              "value": "something"
+            },
+            {
+              "name": "accept",
+              "in": "headers",
+              "schema": {
+                "type": "string"
+              },
+              "value": "application/json"
+            }
+          ],
+          "requestBody": {}
+        }
+      },
+      "expect": {
+        "httpCode": 200,
+        "parameters": [],
+        "content": {
+          "application/json": {
+            "schemaValidation": {
+              "$ref": "books#components#schemas#LIST_BOOKS",
+              "expectValue": {}
             }
           }
         }
@@ -76,11 +182,12 @@
     }
   },
   "runner": {
-    "env": {
-      "development": {
-        "url": "",
-        "description": ""
-      }
+    "development": {
+      "url": "http://localhost:7070/mocks/mocking/5ee4ffa8fd95bc51f94c6d6a?path=",
+      "description": ""
+    },
+    "run": {
+      "mode": "restapi"
     }
   }
 }

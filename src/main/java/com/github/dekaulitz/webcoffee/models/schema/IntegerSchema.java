@@ -1,14 +1,14 @@
 package com.github.dekaulitz.webcoffee.models.schema;
 
-public class IntegerSchema extends io.swagger.v3.oas.models.media.IntegerSchema {
+public class IntegerSchema extends WebCoffeeSchema<Integer> {
 
-  private String value;
+  private Integer value;
 
-  public String getValue() {
+  public Integer getValue() {
     return value;
   }
 
-  public void setValue(String value) {
+  public void setValue(Integer value) {
     this.value = value;
   }
 }

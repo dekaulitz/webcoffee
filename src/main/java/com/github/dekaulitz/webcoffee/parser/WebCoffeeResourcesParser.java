@@ -3,9 +3,11 @@ package com.github.dekaulitz.webcoffee.parser;
 import static com.github.dekaulitz.webcoffee.helper.WebCoffeeHelper.getNodeObject;
 import static com.github.dekaulitz.webcoffee.helper.WebCoffeeHelper.getNodeString;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.dekaulitz.webcoffee.errorHandler.WebCoffeeException;
 import com.github.dekaulitz.webcoffee.helper.FileLoader;
+import com.github.dekaulitz.webcoffee.helper.JsonMapper;
 import com.github.dekaulitz.webcoffee.models.WebCoffeeExternalDocs;
 import com.github.dekaulitz.webcoffee.models.WebCoffeeResources;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -43,17 +45,21 @@ public class WebCoffeeResourcesParser {
           throw new WebCoffeeException(
               "file " + webCoffeeResources.getPath() + " is not exists");
         }
+        String openApiContent=FileLoader.loadContent(refPath);
         OpenAPI openAPI = FileLoader
-            .parsingIntoOpenApi(FileLoader.loadContent(refPath))
+            .parsingIntoOpenApi(openApiContent)
             .getOpenAPI();
         webCoffeeResources.setOpenAPI(openAPI);
         webCoffeeResources.setExternalDocs(
             getExternalDocs(getNodeObject("externalDocs", true, node)));
+        webCoffeeResources.setOpenAPINode(JsonMapper.mapper().readTree(openApiContent));
         webCoffeeResourcesMap.put(key, webCoffeeResources);
       } catch (WebCoffeeException e) {
         e.printStackTrace();
         log.error(e);
         webCoffeeParser.setMessage(e.getMessage());
+      } catch (JsonProcessingException e) {
+        e.printStackTrace();
       }
     });
 

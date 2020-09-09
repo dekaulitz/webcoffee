@@ -1,0 +1,113 @@
+{
+  "webCoffee": "1",
+  "info": {
+    "title": "Scenario do test login and do auth",
+    "version": "v1.0"
+  },
+  "environment": {
+    "production": {
+      "url": "",
+      "description": ""
+    },
+    "development": {
+      "url": "",
+      "description": ""
+    }
+  },
+  "resources": {
+    "books": {
+      "path": "/Users/dekaulitz/projects/webcoffee/config/contracts/book.service.json",
+      "externalDocs": {
+        "description": "do auth",
+        "url": "http://localhost:8080/docs"
+      }
+    }
+  },
+  "specs": {
+    "doGenerateOTP": {
+      "def": {
+        "generalScript": {
+          "load": "/home/usr/fahmi/node.js",
+          "engine": "javascript",
+          "arguments": {
+            "$phoneNumber": {
+              "run": "randomPhoneNumber()"
+            }
+          }
+        }
+      },
+      "given": {
+        "$ref": "auth#paths#/v1/auth/dologin#post",
+        "statements": {
+          "parameters": [
+            {
+              "name": "asd",
+              "in": "header",
+              "value": "asdsad"
+            }
+          ],
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "$ref": "auth#components#schemas#GENERATE_OTP",
+                "payload": {
+                  "type": "object",
+                  "properties": {
+                    "phoneNumber": {
+                      "name": "berak",
+                      "type": "string",
+                      "value": "085782390141"
+                    },
+                    "refId": {
+                      "type": "string",
+                      "value": "asdasd"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "expect": {
+        "httpCode": 200,
+        "parameters": [],
+        "content": {
+          "application/json": {
+            "schemaValidation": {
+              "$ref": "auth#components#schemas#OTP_RESPONSE",
+              "expectValue": {
+                "type": "object",
+                "properties": {
+                  "userId": {
+                    "type": "string",
+                    "value": "123321"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "getAllBooks": {
+      "def": {},
+      "given": {
+        "$ref": "books#paths#/books#get",
+        "statements": {
+          "parameters": [
+            {"name": "clientId","in": "headers","value": "something"}
+          ]
+        }
+
+      },
+      "expect": {}
+    }
+  },
+  "runner": {
+    "development": {
+      "url": "http://localhost:8080",
+      "description": ""
+    }
+  }
+}

@@ -1,5 +1,6 @@
 package com.github.dekaulitz.webcoffee.models;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.v3.oas.models.OpenAPI;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,4 +16,5 @@ public class WebCoffeeResources {
   private String path;
   private WebCoffeeExternalDocs externalDocs;
   private OpenAPI openAPI;
+  private JsonNode openAPINode;
 }

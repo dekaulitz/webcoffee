@@ -4,14 +4,16 @@ import static com.github.dekaulitz.webcoffee.helper.WebCoffeeHelper.getNodeObjec
 import static com.github.dekaulitz.webcoffee.helper.WebCoffeeHelper.getNodeString;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.dekaulitz.webcoffee.errorHandler.WebCoffeeException;
 import com.github.dekaulitz.webcoffee.helper.FileLoader;
 import com.github.dekaulitz.webcoffee.helper.JsonMapper;
 import com.github.dekaulitz.webcoffee.helper.WebCoffeeHelper;
 import com.github.dekaulitz.webcoffee.models.WebCoffee;
+import com.github.dekaulitz.webcoffee.models.WebCoffeeEnvironmentInfo;
 import com.github.dekaulitz.webcoffee.models.WebCoffeeInfo;
+import com.github.dekaulitz.webcoffee.models.runner.WebCoffeeRunnerEnv;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,6 +49,7 @@ public class WebCoffeeParser {
     WebCoffee webCoffee = new WebCoffee();
     webCoffee.setWebCoffee(getNodeString("webCoffee", true, jsonNode));
     webCoffee.setInfo(getWebCoffeInfo(getNodeObject("info", true, jsonNode)));
+    webCoffee.setEnvironment(getEnvironment(getNodeObject("environment", false, jsonNode)));
     webCoffee.setResources(
         new WebCoffeeResourcesParser()
             .getWebCoffeeResources(
@@ -56,17 +59,45 @@ public class WebCoffeeParser {
         .getWebCoffeeSpecs(webCoffee.getResources(),
             getNodeObject("specs", true, jsonNode),
             this));
-    webCoffee.setRunner(getWebCoffeeRunner(webCoffee,jsonNode));
+    webCoffee.setRunner(getWebCoffeeRunner(webCoffee, getNodeObject("runner", true, jsonNode)));
     return webCoffee;
   }
 
-  private Map<String, Object> getWebCoffeeRunner(WebCoffee webCoffee, JsonNode jsonNode)
-      throws WebCoffeeException {
-    return JsonMapper.mapper()
-        .convertValue(getNodeObject("runner", true, jsonNode),
-            new TypeReference<Map<String, Object>>() {
-            });
+  private Map<String, WebCoffeeEnvironmentInfo> getEnvironment(ObjectNode environment) {
+    Map<String, WebCoffeeEnvironmentInfo> webCoffeeEnvironment = new HashMap<>();
+    environment.fields().forEachRemaining(value -> {
+      try {
+        final String key = value.getKey();
+        WebCoffeeEnvironmentInfo webCoffeeEnvironmentInfo = new WebCoffeeEnvironmentInfo();
+        webCoffeeEnvironmentInfo
+            .setDescription(getNodeString("description", false, value.getValue()));
+        webCoffeeEnvironmentInfo.setUrl(getNodeString("url", false, value.getValue()));
+        webCoffeeEnvironment.put(key, webCoffeeEnvironmentInfo);
+      } catch (WebCoffeeException e) {
+        e.printStackTrace();
+      }
+    });
+    return webCoffeeEnvironment;
   }
+
+  private Map<String, WebCoffeeRunnerEnv> getWebCoffeeRunner(WebCoffee webCoffee,
+      ObjectNode runner) {
+    Map<String, WebCoffeeRunnerEnv> stringWebCoffeeRunnerEnvMap = new HashMap<>();
+    runner.fields().forEachRemaining(stringJsonNodeEntry -> {
+      final String key = stringJsonNodeEntry.getKey();
+      final ObjectNode objectNode = (ObjectNode) stringJsonNodeEntry.getValue();
+      WebCoffeeRunnerEnv webCoffeeRunnerEnv = new WebCoffeeRunnerEnv();
+      try {
+        webCoffeeRunnerEnv.setDescription(getNodeString("description", false, objectNode));
+        webCoffeeRunnerEnv.setUrl(getNodeString("url", false, objectNode));
+        stringWebCoffeeRunnerEnvMap.put(key, webCoffeeRunnerEnv);
+      } catch (WebCoffeeException e) {
+        e.printStackTrace();
+      }
+    });
+    return stringWebCoffeeRunnerEnvMap;
+  }
+
 
   private WebCoffeeInfo getWebCoffeInfo(JsonNode jsonNode) throws WebCoffeeException {
     WebCoffeeInfo webCoffeeInfo = new WebCoffeeInfo();

@@ -1,20 +1,18 @@
 package com.github.dekaulitz.webcoffee.parser;
 
-import static com.github.dekaulitz.webcoffee.helper.WebCoffeeHelper.extractString;
+import static com.github.dekaulitz.webcoffee.helper.WebCoffeeHelper.getArrayObjectNode;
 import static com.github.dekaulitz.webcoffee.helper.WebCoffeeHelper.getNodeInteger;
 import static com.github.dekaulitz.webcoffee.helper.WebCoffeeHelper.getNodeObject;
 import static com.github.dekaulitz.webcoffee.helper.WebCoffeeHelper.getNodeString;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.dekaulitz.webcoffee.errorHandler.WebCoffeeException;
-import com.github.dekaulitz.webcoffee.helper.JsonMapper;
+import com.github.dekaulitz.webcoffee.helper.WebCoffeeReference;
 import com.github.dekaulitz.webcoffee.models.WebCoffeeResources;
 import com.github.dekaulitz.webcoffee.models.spec.WebCoffeeExpect;
 import com.github.dekaulitz.webcoffee.models.spec.WebCoffeeGiven;
 import com.github.dekaulitz.webcoffee.models.spec.WebCoffeeRequestBody;
-import com.github.dekaulitz.webcoffee.models.spec.WebCoffeeSchemaValidation;
 import com.github.dekaulitz.webcoffee.models.spec.WebCoffeeSpecs;
 import com.github.dekaulitz.webcoffee.models.spec.WebCoffeeStatements;
 import io.swagger.v3.oas.models.Operation;
@@ -43,8 +41,10 @@ public class WebCoffeeSpecParser {
         webCoffeeSpecs
             .setGiven(getWebCoffeeSpecGive(resources, getNodeObject("given", true, node),
                 webCoffeeParser));
-        webCoffeeSpecs
-            .setExpect(getWebCoffeeSpecExpect(resources, getNodeObject("expect", true, node)));
+        ObjectNode expect = getNodeObject("expect", false, node);
+        if (!expect.isEmpty()) {
+          webCoffeeSpecs.setExpect(getWebCoffeeSpecExpect(resources, expect));
+        }
         webCoffeeSpecsMap.put(key, webCoffeeSpecs);
       } catch (WebCoffeeException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
         e.printStackTrace();
@@ -59,33 +59,17 @@ public class WebCoffeeSpecParser {
       ObjectNode expect) throws WebCoffeeException {
     WebCoffeeExpect webCoffeeExpect = new WebCoffeeExpect();
     webCoffeeExpect.setHttpCode(getNodeInteger("httpCode", false, expect));
-    webCoffeeExpect.setParameters(JsonMapper.mapper()
-        .convertValue(getNodeObject("parameters", true, expect),
-            new TypeReference<Map<String, Object>>() {
-            }));
+//    webCoffeeExpect.setParameters(JsonMapper.mapper()
+//        .convertValue(getNodeObject("parameters", true, expect),
+//            new TypeReference<Map<String, Object>>() {
+//            }));
+    webCoffeeExpect.setParameters(new WebCoffeeParameterParser()
+        .getParameters(getArrayObjectNode("parameters", false, expect), resources));
     webCoffeeExpect
         .setContent(new WebCoffeeSchemaValidationParser()
             .getWebCoffeeExpectContent(resources, getNodeObject("content", true, expect)));
     return webCoffeeExpect;
   }
-
-  private Map<String, WebCoffeeSchemaValidation> getWebCoffeeExpectContent(
-      Map<String, WebCoffeeResources> resources, ObjectNode content) {
-    Map<String, WebCoffeeSchemaValidation> webCoffeeResourcesMap = new HashMap<>();
-    content.fields().forEachRemaining(stringJsonNodeEntry -> {
-      final String key = stringJsonNodeEntry.getKey();
-      WebCoffeeSchemaValidation webCoffeeSchemaValidation = new WebCoffeeSchemaValidation();
-      try {
-        webCoffeeSchemaValidation.set$ref(getNodeString("$ref", true, content));
-        webCoffeeResourcesMap.put(key, webCoffeeSchemaValidation);
-      } catch (WebCoffeeException e) {
-        e.printStackTrace();
-        log.error(e);
-      }
-    });
-    return webCoffeeResourcesMap;
-  }
-
 
   private WebCoffeeGiven getWebCoffeeSpecGive(
       Map<String, WebCoffeeResources> resources,
@@ -93,7 +77,12 @@ public class WebCoffeeSpecParser {
       throws WebCoffeeException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
     WebCoffeeGiven webCoffeeGiven = new WebCoffeeGiven();
     webCoffeeGiven.set$ref(getNodeString("$ref", true, given));
-    webCoffeeGiven.setOperation(getPathOperation(webCoffeeGiven.get$ref(), resources));
+    WebCoffeeReference webCoffeeReference = WebCoffeeReference
+        .getReference(webCoffeeGiven.get$ref());
+    webCoffeeGiven
+        .setOperation(getPathOperation(webCoffeeGiven.get$ref(), webCoffeeReference, resources));
+    webCoffeeGiven.setHttpMethod(webCoffeeReference.getHttpMethod());
+    webCoffeeGiven.setPathEndpoint(webCoffeeReference.getReference());
     webCoffeeGiven.setStatements(
         getWebCoffeeStatements(getNodeObject("statements", true, given), resources,
             webCoffeeParser));
@@ -105,14 +94,18 @@ public class WebCoffeeSpecParser {
       WebCoffeeParser webCoffeeParser)
       throws WebCoffeeException {
     WebCoffeeStatements webCoffeeStatements = new WebCoffeeStatements();
-    webCoffeeStatements.setParameters(JsonMapper.mapper()
-        .convertValue(getNodeObject("parameters", true, statements),
-            new TypeReference<Map<String, Object>>() {
-            }));
+//    webCoffeeStatements.setParameters(JsonMapper.mapper()
+//        .convertValue(getNodeObject("parameters", true, statements),
+//            new TypeReference<List<Object>>() {
+//            }));
     webCoffeeStatements
-        .setRequestBody(
-            getRequestBody(getNodeObject("requestBody", true, statements), resources,
-                webCoffeeParser));
+        .setParameters(new WebCoffeeParameterParser()
+            .getParameters(getArrayObjectNode("parameters", false, statements), resources));
+    ObjectNode requestBody = getNodeObject("requestBody", true, statements);
+    if (!requestBody.isEmpty()) {
+      webCoffeeStatements.setRequestBody(getRequestBody(requestBody, resources,
+          webCoffeeParser));
+    }
     return webCoffeeStatements;
   }
 
@@ -127,22 +120,19 @@ public class WebCoffeeSpecParser {
   }
 
   private Operation getPathOperation(String $ref,
+      WebCoffeeReference webCoffeeReference,
       Map<String, WebCoffeeResources> resources)
       throws WebCoffeeException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-
-    String[] ref = extractString($ref);
-    if (ref.length != 4) {
-      throw new WebCoffeeException("invalid reference" + $ref);
-    }
-    WebCoffeeResources webCoffeeResource = resources.get(ref[0]);
+    WebCoffeeResources webCoffeeResource = resources.get(webCoffeeReference.getReferenceKey());
     if (webCoffeeResource == null) {
       throw new WebCoffeeException("invalid reference" + $ref);
     }
-    PathItem pathItem = webCoffeeResource.getOpenAPI().getPaths().get(ref[2]);
+    PathItem pathItem = webCoffeeResource.getOpenAPI().getPaths()
+        .get(webCoffeeReference.getReference());
     if (pathItem == null) {
       throw new WebCoffeeException("path operation is null");
     }
-    String httpMethod = ref[3].toLowerCase();
+    String httpMethod = webCoffeeReference.getHttpMethod().toLowerCase();
     Method method = pathItem.getClass().getMethod(
         "get" + httpMethod.substring(0, 1).toUpperCase() + httpMethod.substring(1));
     Operation operation = (Operation) method.invoke(pathItem);
