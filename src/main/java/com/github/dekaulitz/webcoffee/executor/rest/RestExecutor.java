@@ -13,8 +13,6 @@ import com.github.dekaulitz.webcoffee.models.runner.WebCoffeeRunnerEnv;
 import com.github.dekaulitz.webcoffee.models.schema.WebCoffeeSchema;
 import com.github.dekaulitz.webcoffee.models.spec.WebCoffeeExpect;
 import com.github.dekaulitz.webcoffee.models.spec.WebCoffeeSpecs;
-import io.restassured.RestAssured;
-import io.restassured.module.jsv.JsonSchemaValidator;
 import io.restassured.response.Response;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import java.util.HashMap;
@@ -104,14 +102,4 @@ public class RestExecutor implements CoffeeExecutor {
         .validateSchema(this.webCoffeeSpecs.getExpect().getContent().get("application/json")
             .getRawSchema(), response.body().asString()));
   }
-
-  public void restAssured() {
-    Response response = RestAssured.given().accept(ContentType.JSON)
-        .get(this.getHost() + this.getEndpoint())
-        .then()
-        .assertThat()
-        .statusCode(this.getWebCoffeeSpecs().getExpect().getHttpCode())
-        .body(JsonSchemaValidator.matchesJsonSchema(
-            this.getWebCoffeeSpecs().getExpect().getContent().get("application/json").getRawSchema()))
-        .log().everything();
 }
