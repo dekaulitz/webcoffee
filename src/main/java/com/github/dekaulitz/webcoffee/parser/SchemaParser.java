@@ -6,18 +6,8 @@ import static com.github.dekaulitz.webcoffee.helper.WebCoffeeHelper.getNodeStrin
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.dekaulitz.webcoffee.errorHandler.WebCoffeeException;
 import com.github.dekaulitz.webcoffee.models.schema.StringSchema;
-import io.swagger.v3.oas.models.media.BinarySchema;
-import io.swagger.v3.oas.models.media.BooleanSchema;
-import io.swagger.v3.oas.models.media.ByteArraySchema;
-import io.swagger.v3.oas.models.media.DateSchema;
-import io.swagger.v3.oas.models.media.DateTimeSchema;
-import io.swagger.v3.oas.models.media.EmailSchema;
-import io.swagger.v3.oas.models.media.IntegerSchema;
-import io.swagger.v3.oas.models.media.NumberSchema;
-import io.swagger.v3.oas.models.media.ObjectSchema;
-import io.swagger.v3.oas.models.media.PasswordSchema;
+import com.github.dekaulitz.webcoffee.models.schema.WebCoffeeSchema;
 import io.swagger.v3.oas.models.media.Schema;
-import io.swagger.v3.oas.models.media.UUIDSchema;
 import io.swagger.v3.parser.util.SchemaTypeUtil;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,15 +20,17 @@ public class SchemaParser extends SchemaTypeUtil {
   private static final String TYPE = "type";
   private static final String FORMAT = "format";
   private static final String VALUE = "value";
+  private static final String REFVALUE = "$refValue";
 
-  public static Schema createSchemaFromNode(ObjectNode node) throws WebCoffeeException {
+  public static WebCoffeeSchema createSchemaFromNode(ObjectNode node) throws WebCoffeeException {
     final String type = getNodeString(TYPE, true, node);
     final String format = getNodeString(FORMAT, false, node);
     final String value = getNodeString(VALUE, false, node);
-    return createSchema(createSchema(type, format, value), node);
+    final String refValue = getNodeString(REFVALUE, false, node);
+    return createSchema(createSchema(type, format, value, refValue), node);
   }
 
-  private static Schema createSchema(Schema schema,
+  private static WebCoffeeSchema createSchema(WebCoffeeSchema schema,
       ObjectNode node) throws WebCoffeeException {
     schema.setTitle(getNodeString("title", false, node));
     ObjectNode propertiesNode = getNodeObject("properties", false, node);
@@ -60,58 +52,24 @@ public class SchemaParser extends SchemaTypeUtil {
     return schema;
   }
 
-  public static Schema createSchema(String type, String format, String value) {
-
-    if (INTEGER_TYPE.equals(type)) {
+  public static WebCoffeeSchema createSchema(String type, String format, String value,
+      String refValue) {
+    if (STRING_TYPE.equals(type)) {
       if (StringUtils.isBlank(format)) {
-        return new IntegerSchema().format(null);
+        StringSchema stringSchema = new StringSchema();
+        stringSchema.format(null);
+        stringSchema.setValue(value);
+        stringSchema.set$refValue(refValue);
+        return stringSchema;
       } else {
-        return new IntegerSchema().format(format);
+        StringSchema stringSchema = new StringSchema();
+        stringSchema.format(format);
+        stringSchema.setValue(value);
+        stringSchema.set$refValue(refValue);
+        return stringSchema;
       }
-    } else if (NUMBER_TYPE.equals(type)) {
-      if (StringUtils.isBlank(format)) {
-        return new NumberSchema();
-      } else {
-        return new NumberSchema().format(format);
-      }
-    } else if (BOOLEAN_TYPE.equals(type)) {
-      if (StringUtils.isBlank(format)) {
-        return new BooleanSchema();
-      } else {
-        return new BooleanSchema().format(format);
-      }
-    } else if (STRING_TYPE.equals(type)) {
-      if (BYTE_FORMAT.equals(format)) {
-        return new ByteArraySchema();
-      } else if (BINARY_FORMAT.equals(format)) {
-        return new BinarySchema();
-      } else if (DATE_FORMAT.equals(format)) {
-        return new DateSchema();
-      } else if (DATE_TIME_FORMAT.equals(format)) {
-        return new DateTimeSchema();
-      } else if (PASSWORD_FORMAT.equals(format)) {
-        return new PasswordSchema();
-      } else if (EMAIL_FORMAT.equals(format)) {
-        return new EmailSchema();
-      } else if (UUID_FORMAT.equals(format)) {
-        return new UUIDSchema();
-      } else {
-        if (StringUtils.isBlank(format)) {
-          StringSchema stringSchema = new StringSchema();
-          stringSchema.format(null);
-          stringSchema.setValue(value);
-          return stringSchema;
-        } else {
-          StringSchema stringSchema = new StringSchema();
-          stringSchema.format(format);
-          stringSchema.setValue(value);
-          return stringSchema;
-        }
-      }
-    } else if (OBJECT_TYPE.equals(type)) {
-      return new ObjectSchema();
     } else {
-      return new Schema();
+      return new WebCoffeeSchema();
     }
   }
 }

@@ -47,7 +47,7 @@ public class WebCoffeeHelper {
   }
 
   public static Boolean getBooleanNode(String key, boolean required, JsonNode jsonNode) {
-    ArrayNode value = (ArrayNode) jsonNode.get(key);
+    JsonNode value = jsonNode.get(key);
     if (required || value == null) {
       return false;
     }

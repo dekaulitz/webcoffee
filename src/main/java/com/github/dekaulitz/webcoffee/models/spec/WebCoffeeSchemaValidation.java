@@ -1,6 +1,7 @@
 package com.github.dekaulitz.webcoffee.models.spec;
 
 
+import com.github.dekaulitz.webcoffee.models.schema.WebCoffeeSchema;
 import io.swagger.v3.oas.models.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,7 +16,7 @@ public class WebCoffeeSchemaValidation {
 
   private String $ref;
   private Schema schema;
-  private Schema expectValue;
+  private WebCoffeeSchema expectValue;
   private String rawSchema;
 
   public String get$ref() {

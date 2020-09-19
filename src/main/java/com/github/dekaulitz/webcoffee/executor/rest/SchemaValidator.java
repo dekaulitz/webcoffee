@@ -10,24 +10,25 @@ public class SchemaValidator {
 
 
   public static boolean validateSchema(String rawSchema, String s) throws WebCoffeeException {
-    return new JsonSchemaValidatorFactory() {
+    return new JsonSchemaValidatorFactory<JsonNode>() {
       @Override
       JsonNode createSchemaInstance(String input) throws IOException {
         return null;
       }
 
       @Override
-      public boolean validate(String rawSchema) {
-        return true;
+      boolean validate(String rawSchema) {
+        return false;
       }
     }.validate(rawSchema);
   }
 
-  private static abstract class JsonSchemaValidatorFactory {
+  private static abstract class JsonSchemaValidatorFactory<T> {
 
 
-    abstract JsonNode createSchemaInstance(String input) throws IOException;
+    abstract T createSchemaInstance(String input) throws IOException;
 
-    public abstract boolean validate(String rawSchema);
+    abstract boolean validate(String rawSchema);
   }
+
 }

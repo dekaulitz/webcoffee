@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.Getter;
+import lombok.Setter;
 import okhttp3.MediaType;
 
 
@@ -22,13 +23,14 @@ public class RequestBuilder {
   public RequestSpecification requestSpecification = RestAssured.given();
   private List<Parameter> parameters;
   @Getter
-  private String content = "application/json";
+  @Setter
+  private String mediaType = "application/json";
   @Getter
   private ValidatableResponse validateResponse;
 
   public RequestBuilder(WebCoffeeSpecs webCoffeeSpecs) {
     this.webCoffeeSpecs = webCoffeeSpecs;
-    parameters = webCoffeeSpecs.getGiven().getStatements().getParameters();
+    parameters = webCoffeeSpecs.getGiven().getParameters();
   }
 
   public RequestBuilder given() {
@@ -46,9 +48,9 @@ public class RequestBuilder {
         }
       });
     }
-    if (this.webCoffeeSpecs.getGiven().getStatements().getRequestBody() != null) {
+    if (this.webCoffeeSpecs.getGiven().getRequestBody() != null) {
       requestSpecification.body(getPayloadObject(
-          this.webCoffeeSpecs.getGiven().getStatements().getRequestBody()));
+          this.webCoffeeSpecs.getGiven().getRequestBody()));
     }
 
     return this;
@@ -73,12 +75,13 @@ public class RequestBuilder {
         this.validateResponse = requestSpecification.patch(fullPath).then();
         break;
     }
+    this.validateResponse.log().all();
     return this;
   }
 
   private Map<String, Object> getPayloadObject(WebCoffeeRequestBody requestBody) {
     Map<String, Object> body = new HashMap<>();
-    Map<String, WebCoffeeSchema> payload = requestBody.getContent().get(content).getPayload()
+    Map<String, WebCoffeeSchema> payload = requestBody.getContent().get(mediaType).getPayload()
         .getProperties();
     for (Map.Entry<String, WebCoffeeSchema> entry : payload.entrySet()) {
       body.put(entry.getKey(), entry.getValue().getValue());

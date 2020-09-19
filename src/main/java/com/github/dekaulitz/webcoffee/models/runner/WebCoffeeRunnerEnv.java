@@ -11,7 +11,9 @@ import lombok.Setter;
 @Setter
 public class WebCoffeeRunnerEnv {
 
-  private String url;
-  private String description;
+  private String mode;
+  private String environment;
+  private String applicationType;
+  private String hostname;
 
 }

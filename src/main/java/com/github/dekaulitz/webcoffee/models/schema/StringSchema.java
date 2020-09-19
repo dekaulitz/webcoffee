@@ -11,4 +11,5 @@ public class StringSchema extends WebCoffeeSchema<String> {
   public void setValue(String value) {
     this.value = value;
   }
+
 }

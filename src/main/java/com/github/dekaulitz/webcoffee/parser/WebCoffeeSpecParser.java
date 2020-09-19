@@ -1,6 +1,7 @@
 package com.github.dekaulitz.webcoffee.parser;
 
 import static com.github.dekaulitz.webcoffee.helper.WebCoffeeHelper.getArrayObjectNode;
+import static com.github.dekaulitz.webcoffee.helper.WebCoffeeHelper.getBooleanNode;
 import static com.github.dekaulitz.webcoffee.helper.WebCoffeeHelper.getNodeInteger;
 import static com.github.dekaulitz.webcoffee.helper.WebCoffeeHelper.getNodeObject;
 import static com.github.dekaulitz.webcoffee.helper.WebCoffeeHelper.getNodeString;
@@ -14,7 +15,6 @@ import com.github.dekaulitz.webcoffee.models.spec.WebCoffeeExpect;
 import com.github.dekaulitz.webcoffee.models.spec.WebCoffeeGiven;
 import com.github.dekaulitz.webcoffee.models.spec.WebCoffeeRequestBody;
 import com.github.dekaulitz.webcoffee.models.spec.WebCoffeeSpecs;
-import com.github.dekaulitz.webcoffee.models.spec.WebCoffeeStatements;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
 import java.lang.reflect.InvocationTargetException;
@@ -26,20 +26,17 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class WebCoffeeSpecParser {
 
-  public static final String SPECS = "specs";
-
-  public Map<String, WebCoffeeSpecs> getWebCoffeeSpecs(
-      Map<String, WebCoffeeResources> resources,
-      JsonNode nodeObject,
-      WebCoffeeParser webCoffeeParser) {
+  public Map<String, WebCoffeeSpecs> getWebCoffeeSpecs(Map<String, WebCoffeeResources> resources,
+      JsonNode nodeObject, WebCoffeeParser webCoffeeParser) {
     Map<String, WebCoffeeSpecs> webCoffeeSpecsMap = new HashMap<>();
     nodeObject.fields().forEachRemaining(stringJsonNodeEntry -> {
       WebCoffeeSpecs webCoffeeSpecs = new WebCoffeeSpecs();
       String key = stringJsonNodeEntry.getKey();
       JsonNode node = stringJsonNodeEntry.getValue();
       try {
+        webCoffeeSpecs.setSkip(getBooleanNode("skip",false,node));
         webCoffeeSpecs
-            .setGiven(getWebCoffeeSpecGive(resources, getNodeObject("given", true, node),
+            .setGiven(getWebCoffeeSpecGiven(resources, getNodeObject("given", true, node),
                 webCoffeeParser));
         ObjectNode expect = getNodeObject("expect", false, node);
         if (!expect.isEmpty()) {
@@ -55,14 +52,11 @@ public class WebCoffeeSpecParser {
     return webCoffeeSpecsMap;
   }
 
+  //parsing expect
   private WebCoffeeExpect getWebCoffeeSpecExpect(Map<String, WebCoffeeResources> resources,
       ObjectNode expect) throws WebCoffeeException {
     WebCoffeeExpect webCoffeeExpect = new WebCoffeeExpect();
     webCoffeeExpect.setHttpCode(getNodeInteger("httpCode", false, expect));
-//    webCoffeeExpect.setParameters(JsonMapper.mapper()
-//        .convertValue(getNodeObject("parameters", true, expect),
-//            new TypeReference<Map<String, Object>>() {
-//            }));
     webCoffeeExpect.setParameters(new WebCoffeeParameterParser()
         .getParameters(getArrayObjectNode("parameters", false, expect), resources));
     webCoffeeExpect
@@ -71,7 +65,8 @@ public class WebCoffeeSpecParser {
     return webCoffeeExpect;
   }
 
-  private WebCoffeeGiven getWebCoffeeSpecGive(
+  //parsing given
+  private WebCoffeeGiven getWebCoffeeSpecGiven(
       Map<String, WebCoffeeResources> resources,
       JsonNode given, WebCoffeeParser webCoffeeParser)
       throws WebCoffeeException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
@@ -83,32 +78,19 @@ public class WebCoffeeSpecParser {
         .setOperation(getPathOperation(webCoffeeGiven.get$ref(), webCoffeeReference, resources));
     webCoffeeGiven.setHttpMethod(webCoffeeReference.getHttpMethod());
     webCoffeeGiven.setPathEndpoint(webCoffeeReference.getReference());
-    webCoffeeGiven.setStatements(
-        getWebCoffeeStatements(getNodeObject("statements", true, given), resources,
-            webCoffeeParser));
+    webCoffeeGiven
+        .setParameters(new WebCoffeeParameterParser()
+            .getParameters(getArrayObjectNode("parameters", false, given), resources));
+    ObjectNode requestBody = getNodeObject("requestBody", true, given);
+    if (!requestBody.isEmpty()) {
+      webCoffeeGiven.setRequestBody(getRequestBody(requestBody, resources,
+          webCoffeeParser));
+    }
+
     return webCoffeeGiven;
   }
 
-  private WebCoffeeStatements getWebCoffeeStatements(ObjectNode statements,
-      Map<String, WebCoffeeResources> resources,
-      WebCoffeeParser webCoffeeParser)
-      throws WebCoffeeException {
-    WebCoffeeStatements webCoffeeStatements = new WebCoffeeStatements();
-//    webCoffeeStatements.setParameters(JsonMapper.mapper()
-//        .convertValue(getNodeObject("parameters", true, statements),
-//            new TypeReference<List<Object>>() {
-//            }));
-    webCoffeeStatements
-        .setParameters(new WebCoffeeParameterParser()
-            .getParameters(getArrayObjectNode("parameters", false, statements), resources));
-    ObjectNode requestBody = getNodeObject("requestBody", true, statements);
-    if (!requestBody.isEmpty()) {
-      webCoffeeStatements.setRequestBody(getRequestBody(requestBody, resources,
-          webCoffeeParser));
-    }
-    return webCoffeeStatements;
-  }
-
+  //get request body
   private WebCoffeeRequestBody getRequestBody(ObjectNode requestBody,
       Map<String, WebCoffeeResources> resources,
       WebCoffeeParser webCoffeeParser) throws WebCoffeeException {
@@ -119,6 +101,7 @@ public class WebCoffeeSpecParser {
     return webCoffeeRequestBody;
   }
 
+  //get path endpoint
   private Operation getPathOperation(String $ref,
       WebCoffeeReference webCoffeeReference,
       Map<String, WebCoffeeResources> resources)

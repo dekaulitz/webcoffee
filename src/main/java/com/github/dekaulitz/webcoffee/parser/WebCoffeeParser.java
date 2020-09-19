@@ -24,8 +24,6 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 public class WebCoffeeParser {
 
-  public final static String WEBCOFFEE = "webCoffee";
-  public final static String INFO = "info";
   private JsonNode jsonNode;
   @Getter
   @Setter
@@ -80,22 +78,23 @@ public class WebCoffeeParser {
     return webCoffeeEnvironment;
   }
 
-  private Map<String, WebCoffeeRunnerEnv> getWebCoffeeRunner(WebCoffee webCoffee,
+  private WebCoffeeRunnerEnv getWebCoffeeRunner(WebCoffee webCoffee,
       ObjectNode runner) {
-    Map<String, WebCoffeeRunnerEnv> stringWebCoffeeRunnerEnvMap = new HashMap<>();
-    runner.fields().forEachRemaining(stringJsonNodeEntry -> {
-      final String key = stringJsonNodeEntry.getKey();
-      final ObjectNode objectNode = (ObjectNode) stringJsonNodeEntry.getValue();
-      WebCoffeeRunnerEnv webCoffeeRunnerEnv = new WebCoffeeRunnerEnv();
-      try {
-        webCoffeeRunnerEnv.setDescription(getNodeString("description", false, objectNode));
-        webCoffeeRunnerEnv.setUrl(getNodeString("url", false, objectNode));
-        stringWebCoffeeRunnerEnvMap.put(key, webCoffeeRunnerEnv);
-      } catch (WebCoffeeException e) {
-        e.printStackTrace();
+    WebCoffeeRunnerEnv webCoffeeRunnerEnv = new WebCoffeeRunnerEnv();
+    try {
+      webCoffeeRunnerEnv.setEnvironment(getNodeString("environment", false, runner));
+      webCoffeeRunnerEnv.setMode(getNodeString("mode", false, runner));
+      String hostName = webCoffee.getEnvironment().get(webCoffeeRunnerEnv.getEnvironment())
+          .getUrl();
+      if (hostName.isEmpty()) {
+        throw new WebCoffeeException(
+            "environment " + webCoffeeRunnerEnv.getEnvironment() + " is not initialized");
       }
-    });
-    return stringWebCoffeeRunnerEnvMap;
+      webCoffeeRunnerEnv.setHostname(hostName);
+    } catch (WebCoffeeException e) {
+      e.printStackTrace();
+    }
+    return webCoffeeRunnerEnv;
   }
 
 

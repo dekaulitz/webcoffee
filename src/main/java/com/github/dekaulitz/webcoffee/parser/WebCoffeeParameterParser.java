@@ -58,8 +58,8 @@ public class WebCoffeeParameterParser {
     parameter.setName(getNodeString("name",false,item));
     parameter.setIn(value);
     Boolean required = getBooleanNode("required", false, item);
-    if (required != null) {
-      parameter.setRequired(required);
+    if (required) {
+      parameter.setRequired(true);
     } else {
       parameter.setRequired(false);
     }

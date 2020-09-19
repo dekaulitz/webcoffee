@@ -6,17 +6,17 @@ import com.github.dekaulitz.webcoffee.executor.rest.RestExecutor;
 import com.github.dekaulitz.webcoffee.executor.web.WebExecutor;
 import lombok.Getter;
 
-public class CoffeFactory {
+public class CoffeeFactory {
 
   @Getter
   private CoffeeExecutor coffeeExecutor;
 
-  public CoffeeExecutor executor(CoffeeMode coffeeMode) throws WebCoffeeException {
+  public CoffeeExecutor executor(String coffeeMode) throws WebCoffeeException {
     switch (coffeeMode) {
-      case REST_API:
+      case "restapi":
         coffeeExecutor = new RestExecutor();
         break;
-      case WEB_BROWSER:
+      case "web":
         coffeeExecutor = new WebExecutor();
         break;
       default:
@@ -25,7 +25,4 @@ public class CoffeFactory {
     return coffeeExecutor;
   }
 
-  enum CoffeeMode {
-    REST_API, WEB_BROWSER, ANDROID_APP, IOS_APP;
-  }
 }

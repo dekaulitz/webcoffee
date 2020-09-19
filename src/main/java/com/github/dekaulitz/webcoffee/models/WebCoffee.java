@@ -20,6 +20,6 @@ public class WebCoffee implements Serializable {
   private Map<String, WebCoffeeEnvironmentInfo>  environment;
   private Map<String, WebCoffeeResources> resources;
   private Map<String, WebCoffeeSpecs> specs;
-  private Map<String, WebCoffeeRunnerEnv> runner;
+  private WebCoffeeRunnerEnv runner;
 
 }

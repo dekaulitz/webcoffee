@@ -1,7 +1,8 @@
 package com.github.dekaulitz.webcoffee;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.dekaulitz.webcoffee.errorHandler.WebCoffeeException;
-import com.github.dekaulitz.webcoffee.executor.rest.RestExecutor;
+import com.github.dekaulitz.webcoffee.executor.CoffeeFactory;
 import com.github.dekaulitz.webcoffee.models.WebCoffee;
 import com.github.dekaulitz.webcoffee.parser.WebCoffeeParser;
 import lombok.extern.log4j.Log4j2;
@@ -23,21 +24,23 @@ class WebCoffeeRunnerTest {
       } else {
         log.info("configuration loaded starting to coffee {}", webCoffee.getInfo().getTitle());
         log.info("load template using version {}", webCoffee.getWebCoffee());
-        webCoffee.getSpecs().forEach((s, webCoffeeComponent) -> {
-          log.info("starting to coffee scenario {} ...", s);
-          RestExecutor restExecutor = new RestExecutor();
+        webCoffee.getSpecs().forEach((usecase, webCoffeeComponent) -> {
+          log.info("starting to coffee scenario {} ...", usecase);
           try {
-            restExecutor.setEnvironment(webCoffee.getEnvironment().get("development").getUrl());
-            restExecutor.prepare(webCoffeeComponent);
-            restExecutor.execute().validate();
-            Thread.sleep(1000);
-          } catch (WebCoffeeException | InterruptedException e) {
+            if (!webCoffeeComponent.isSkip()) {
+              CoffeeFactory coffeeFactory = new CoffeeFactory();
+              coffeeFactory.executor(webCoffee.getRunner().getMode());
+              coffeeFactory.getCoffeeExecutor().setEnvironment(webCoffee.getRunner());
+              coffeeFactory.getCoffeeExecutor().prepare(usecase, webCoffeeComponent);
+              coffeeFactory.getCoffeeExecutor().execute().validate();
+            }
+          } catch (WebCoffeeException | JsonProcessingException e) {
             e.printStackTrace();
           }
-          log.info("coffee scenario {} finished...", s);
+          log.info("coffee scenario {} finished...", usecase);
         });
-        log.info("webcoffee total usecases {}", webCoffee.getSpecs().size());
-
+        log.info("webcoffee total usecases {}", webCoffee.getSpecs().values().stream().filter(webCoffeeSpecs ->
+            !webCoffeeSpecs.isSkip()).count());
       }
     } catch (WebCoffeeException e) {
       e.printStackTrace();
