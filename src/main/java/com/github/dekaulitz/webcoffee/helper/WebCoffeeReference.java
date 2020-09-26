@@ -21,9 +21,6 @@ public class WebCoffeeReference {
     //"$ref":"auth#components#schemas#GENERATE_OTP",
     WebCoffeeReference webCoffeeReference = new WebCoffeeReference();
     String[] ref = extractString($ref);
-    if (ref.length != 4) {
-      throw new WebCoffeeException("invalid reference");
-    }
     webCoffeeReference.setReferenceKey(ref[0]);
     webCoffeeReference.setReference(ref[2]);
     if (ref[1].toUpperCase().equals(Reference.PATHS.toString())) {

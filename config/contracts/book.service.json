@@ -2187,6 +2187,9 @@
       "HEADERS_CLIENT": {
         "name": "client-id",
         "in": "header",
+        "schema": {
+          "type": "string"
+        },
         "required": true
       },
       "BOOK_ID": {

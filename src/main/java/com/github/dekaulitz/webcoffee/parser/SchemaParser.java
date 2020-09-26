@@ -1,10 +1,10 @@
 package com.github.dekaulitz.webcoffee.parser;
 
-import static com.github.dekaulitz.webcoffee.helper.WebCoffeeHelper.getNodeObject;
 import static com.github.dekaulitz.webcoffee.helper.WebCoffeeHelper.getNodeString;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.dekaulitz.webcoffee.errorHandler.WebCoffeeException;
+import com.github.dekaulitz.webcoffee.helper.NodeHelper;
 import com.github.dekaulitz.webcoffee.models.schema.StringSchema;
 import com.github.dekaulitz.webcoffee.models.schema.WebCoffeeSchema;
 import io.swagger.v3.oas.models.media.Schema;
@@ -21,31 +21,28 @@ public class SchemaParser extends SchemaTypeUtil {
   private static final String FORMAT = "format";
   private static final String VALUE = "value";
   private static final String REFVALUE = "$refValue";
+  private static final String argument = "$refValue";
 
   public static WebCoffeeSchema createSchemaFromNode(ObjectNode node) throws WebCoffeeException {
-    final String type = getNodeString(TYPE, true, node);
-    final String format = getNodeString(FORMAT, false, node);
-    final String value = getNodeString(VALUE, false, node);
-    final String refValue = getNodeString(REFVALUE, false, node);
-    return createSchema(createSchema(type, format, value, refValue), node);
+    final String type = NodeHelper.getNodeString(node, TYPE, true);
+    final String format = NodeHelper.getNodeString(node, FORMAT, false);
+    final String value = NodeHelper.getNodeString(node, VALUE, false);
+    final String refValue = NodeHelper.getNodeString(node, REFVALUE, false);
+    final String argumentValue = NodeHelper.getNodeString(node, argument, false);
+    return createSchema(createSchema(type, format, value, refValue, argumentValue), node);
   }
 
   private static WebCoffeeSchema createSchema(WebCoffeeSchema schema,
       ObjectNode node) throws WebCoffeeException {
     schema.setTitle(getNodeString("title", false, node));
-    ObjectNode propertiesNode = getNodeObject("properties", false, node);
+    ObjectNode propertiesNode = NodeHelper.getObjectNode(node, "properties", false);
     if (propertiesNode != null) {
       Map<String, Schema> properties = new HashMap<>();
       propertiesNode.fields().forEachRemaining(stringJsonNodeEntry -> {
         final String key = stringJsonNodeEntry.getKey();
         final ObjectNode objectNode = (ObjectNode) stringJsonNodeEntry.getValue();
-        try {
-          Schema propertySchema = createSchemaFromNode(objectNode);
-          properties.put(key, propertySchema);
-        } catch (WebCoffeeException e) {
-          e.printStackTrace();
-          log.warn(e.getMessage());
-        }
+        Schema propertySchema = createSchemaFromNode(objectNode);
+        properties.put(key, propertySchema);
       });
       schema.setProperties(properties);
     }
@@ -53,23 +50,22 @@ public class SchemaParser extends SchemaTypeUtil {
   }
 
   public static WebCoffeeSchema createSchema(String type, String format, String value,
-      String refValue) {
+      String refValue, String argumentValue) {
+    WebCoffeeSchema webCoffeeSchema;
     if (STRING_TYPE.equals(type)) {
       if (StringUtils.isBlank(format)) {
-        StringSchema stringSchema = new StringSchema();
-        stringSchema.format(null);
-        stringSchema.setValue(value);
-        stringSchema.set$refValue(refValue);
-        return stringSchema;
+        webCoffeeSchema = new StringSchema();
+        webCoffeeSchema.setFormat(format);
       } else {
-        StringSchema stringSchema = new StringSchema();
-        stringSchema.format(format);
-        stringSchema.setValue(value);
-        stringSchema.set$refValue(refValue);
-        return stringSchema;
+        webCoffeeSchema = new StringSchema();
       }
     } else {
-      return new WebCoffeeSchema();
+      webCoffeeSchema = new WebCoffeeSchema();
     }
+    webCoffeeSchema.setValue(value);
+    webCoffeeSchema.set$refValue(refValue);
+    webCoffeeSchema.set$refValue(refValue);
+    webCoffeeSchema.setArguments(argumentValue);
+    return webCoffeeSchema;
   }
 }

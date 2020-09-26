@@ -1,6 +1,6 @@
 package com.github.dekaulitz.webcoffee.errorHandler;
 
-public class WebCoffeeException extends Exception {
+public class WebCoffeeException extends RuntimeException {
 
   /**
    * Constructs a new exception with the specified detail message.  The cause is not initialized,
