@@ -117,6 +117,14 @@
       "$phoneNumber": {
         "src": "/Users/dekaulitz/projects/webcoffee/config/scripts/phonenumber.js",
         "lang": "js"
+      },
+      "$email": {
+        "src": "/Users/dekaulitz/projects/webcoffee/config/scripts/phonenumber.js",
+        "lang": "js"
+      },
+      "$secret": {
+        "src": "/Users/dekaulitz/projects/webcoffee/config/scripts/phonenumber.js",
+        "lang": "js"
       }
     },
     "coffeeTest": {
