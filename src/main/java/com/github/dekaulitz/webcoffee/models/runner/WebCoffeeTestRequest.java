@@ -14,16 +14,9 @@ import lombok.ToString;
 @Setter
 @ToString
 @Builder
-public class WebCoffeeRunnerEnv {
+public class WebCoffeeTestRequest {
 
-  private String environment;
-  private String applicationType;
-  private String hostname;
-  //global arguments
+  private String host;
   private Map<String, WebCoffeeArgumentsRunner> arguments;
-  private Map<String, WebCoffeeTestRequest> coffeeTest;
-
+  private WebCoffeeDoRequest doRequest;
 }
-
-
-

@@ -42,9 +42,11 @@ public class WebCoffeeParser {
     webCoffee
         .setResources(getResources(NodeHelper.getObjectNode(webCoffeeNode, "resources", true)));
     webCoffee
-        .setSpecs(new WebCoffeeSpecParser(NodeHelper.getObjectNode(webCoffeeNode, "specs", true)).getSpecs(webCoffee));
+        .setSpecs(new WebCoffeeSpecParser(NodeHelper.getObjectNode(webCoffeeNode, "specs", true))
+            .getSpecs(webCoffee));
     webCoffee.setRunner(
-        new WebCoffeeRunnerParser(NodeHelper.getObjectNode(webCoffeeNode, "runner", true))
+        new WebCoffeeRunnerParser(NodeHelper.getObjectNode(webCoffeeNode, "runner", true),
+            webCoffee)
             .getRunner(webCoffee.getEnvironment()));
     return webCoffee;
   }

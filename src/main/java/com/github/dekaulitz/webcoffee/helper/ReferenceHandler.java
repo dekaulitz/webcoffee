@@ -56,7 +56,7 @@ public class ReferenceHandler {
 
   private static void getReferenceRunner(ReferenceHandler referenceHandler, String[] $ref) {
     if ($ref.length != 5) {
-      throw new WebCoffeeValidationExcepton("invalid reference runner");
+      throw new WebCoffeeValidationExcepton("invalid reference runner" + referenceHandler.getReference());
     }
     //runner#coffeTest#requestLogin#response#$refId"
     referenceHandler.objectKey = $ref[1];

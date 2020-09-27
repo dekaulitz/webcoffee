@@ -115,7 +115,7 @@
     "environment": "development",
     "arguments": {
       "$phoneNumber": {
-        "src": "asdasdasd",
+        "src": "/Users/dekaulitz/projects/webcoffee/config/scripts/phonenumber.js",
         "lang": ""
       }
     },
@@ -182,68 +182,6 @@
                           "type": "string",
                           "required": true
                         }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "doLoginAndValidate": {
-        "host": "",
-        "arguments": {
-          "secret": {
-            "src": "/Users/dekaulitz/projects/webcoffee/scripts/webcoffee.json"
-          },
-          "phoneNumber": {
-            "src": "/Users/dekaulitz/projects/webcoffee/scripts/webcoffee.json"
-          }
-        },
-        "do": {
-          "$ref": "runner#coffeTest#requestLogin",
-          "then": {
-            "do": {
-              "$ref": "specs#DO_LOGIN",
-              "arguments": {
-                "refId": {
-                  "$ref": "runner#coffeTest#requestLogin#response#$refId"
-                }
-              },
-              "then": {
-                "expect": {
-                  "httpStatus": 200,
-                  "schemaValidation": {
-                    "$ref": "resources#auth#components#schemas#VALIDATE_PASSWORD_RESPONSE",
-                    "expectValue": {
-                      "expectValue": {
-                        "type": "object",
-                        "properties": {
-                          "refId": {
-                            "type": "string",
-                            "required": true
-                          }
-                        }
-                      }
-                    }
-                  },
-                  "parameters": [
-                    {
-                      "name": "requestId",
-                      "in": "header",
-                      "required": true,
-                      "schema": {
-                        "type": "string"
-                      }
-                    }
-                  ],
-                  "response": {
-                    "type": "object",
-                    "properties": {
-                      "refId": {
-                        "type": "string",
-                        "required": true
                       }
                     }
                   }

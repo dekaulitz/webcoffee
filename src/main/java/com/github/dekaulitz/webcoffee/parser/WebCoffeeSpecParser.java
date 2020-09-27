@@ -1,10 +1,8 @@
 package com.github.dekaulitz.webcoffee.parser;
 
 import static com.github.dekaulitz.webcoffee.helper.NodeHelper.getNodeString;
-import static com.github.dekaulitz.webcoffee.helper.WebCoffeeHelper.getNodeString;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.dekaulitz.webcoffee.errorHandler.WebCoffeeException;
 import com.github.dekaulitz.webcoffee.errorHandler.WebCoffeeValidationExcepton;
@@ -12,11 +10,6 @@ import com.github.dekaulitz.webcoffee.helper.NodeHelper;
 import com.github.dekaulitz.webcoffee.helper.ReferenceHandler;
 import com.github.dekaulitz.webcoffee.models.WebCoffee;
 import com.github.dekaulitz.webcoffee.models.WebCoffeeResources;
-import com.github.dekaulitz.webcoffee.models.parameters.CookieParameter;
-import com.github.dekaulitz.webcoffee.models.parameters.HeaderParameter;
-import com.github.dekaulitz.webcoffee.models.parameters.Parameter;
-import com.github.dekaulitz.webcoffee.models.parameters.PathParameter;
-import com.github.dekaulitz.webcoffee.models.parameters.QueryParameter;
 import com.github.dekaulitz.webcoffee.models.spec.WebCoffeeSpecs;
 import com.github.dekaulitz.webcoffee.models.spec.WebCoffeeSpecs.PathItem;
 import com.github.dekaulitz.webcoffee.models.spec.WebCoffeeSpecsRequestBody;
@@ -26,16 +19,11 @@ import io.swagger.v3.oas.models.media.Schema;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 public class WebCoffeeSpecParser {
 
-  private static final String QUERY_PARAMETER = "query";
-  private static final String COOKIE_PARAMETER = "cookie";
-  private static final String PATH_PARAMETER = "path";
-  private static final String HEADER_PARAMETER = "header";
+
   private final ObjectNode specs;
 
   public WebCoffeeSpecParser(ObjectNode specs) {
@@ -59,7 +47,8 @@ public class WebCoffeeSpecParser {
     pathItem.set$ref(getNodeString(pathNode, "$ref", true));
     webCoffeeSpecs.setPathItem(pathItem);
     webCoffeeSpecs
-        .setParameters(getParameters(NodeHelper.getArrayNode(value, "parameters", false)));
+        .setParameters(WebCoffeeParameterParser
+            .getParameters(NodeHelper.getArrayNode(value, "parameters", false)));
     ReferenceHandler referenceHandler = ReferenceHandler
         .getReference(webCoffeeSpecs.getPathItem().get$ref());
     webCoffeeSpecs.setOperation(getPathOperation(referenceHandler, webCoffee));
@@ -83,7 +72,7 @@ public class WebCoffeeSpecParser {
       webCoffeeSpecsRequestBodyContentRequest
           .setSchema(getSchema(referenceHandler, webCoffee));
       webCoffeeSpecsRequestBodyContentRequest.setPayload(
-          SchemaParser.createSchemaFromNode(
+          WebCoffeeSchemaParser.createSchemaFromNode(
               NodeHelper.getObjectNode(nodeEntry.getValue(), "payload", true)));
       requestBodyContent.put(contentKey, webCoffeeSpecsRequestBodyContentRequest);
       webCoffeeRequestBody.setContent(requestBodyContent);
@@ -105,37 +94,6 @@ public class WebCoffeeSpecParser {
         .get(referenceHandler.getSchemasName());
   }
 
-  private Set<Parameter> getParameters(ArrayNode parameters) {
-    Set<Parameter> webCoffeeSpecsParametersSet = new HashSet<>();
-    if (parameters == null) {
-      return webCoffeeSpecsParametersSet;
-    }
-    parameters.forEach(jsonNode -> {
-      webCoffeeSpecsParametersSet.add(getParameter(jsonNode));
-    });
-    return webCoffeeSpecsParametersSet;
-  }
-
-  private Parameter getParameter(JsonNode item) throws WebCoffeeException {
-    String value = getNodeString("in", true, item);
-    Parameter parameter = null;
-    if (QUERY_PARAMETER.equals(value)) {
-      parameter = new QueryParameter();
-    } else if (HEADER_PARAMETER.equals(value)) {
-      parameter = new HeaderParameter();
-    } else if (PATH_PARAMETER.equals(value)) {
-      parameter = new PathParameter();
-    } else if (COOKIE_PARAMETER.equals(value)) {
-      parameter = new CookieParameter();
-    } else {
-      parameter = new Parameter();
-    }
-    parameter.setName(getNodeString((ObjectNode) item, "name", false));
-    parameter.setIn(value);
-    parameter.setValue(getNodeString((ObjectNode) item, "value", false));
-    parameter.setArgument(getNodeString((ObjectNode) item, "argument", false));
-    return parameter;
-  }
 
   //get path endpoint
   private Operation getPathOperation(ReferenceHandler referenceHandler, WebCoffee webCoffee) {
