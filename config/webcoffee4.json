@@ -110,7 +110,7 @@
     }
   },
   "runner": {
-    "hostName": "asdasd",
+    "hostName": "localhost:8080",
     "mode": "restApi",
     "environment": "development",
     "arguments": {
@@ -131,11 +131,13 @@
       "requestLogin": {
         "host": "",
         "arguments": {
-          "secret": {
-            "src": "/Users/dekaulitz/projects/webcoffee/scripts/webcoffee.json"
+          "$secret": {
+            "src": "/Users/dekaulitz/projects/webcoffee/scripts/webcoffee.json",
+            "lang": "js"
           },
-          "phoneNumber": {
-            "src": "/Users/dekaulitz/projects/webcoffee/scripts/webcoffee.json"
+          "$phoneNumber": {
+            "src": "/Users/dekaulitz/projects/webcoffee/scripts/webcoffee.json",
+            "lang": "js"
           }
         },
         "do": {

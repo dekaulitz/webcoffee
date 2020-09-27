@@ -21,14 +21,10 @@ public class ScriptFactory {
 
     JAVASCRIPT("js");
 
-    private String script;
+    private final String script;
 
     Lang(String script) {
       this.script = script;
-    }
-
-    public String getScript() {
-      return script;
     }
 
     public static Lang getLang(final String lang) {
@@ -37,6 +33,10 @@ public class ScriptFactory {
       }
       throw new WebCoffeeValidationExcepton(
           lang + " is not supported yet");
+    }
+
+    public String getScript() {
+      return script;
     }
   }
 

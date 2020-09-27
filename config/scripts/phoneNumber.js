@@ -7,7 +7,7 @@ var $phoneNumber = function () {
 var $email = function () {
   return randomString(10) + "@" + randomString(5) + ".com";
 }
-var $secet = function () {
+var $secret = function () {
   return CryptoJS.SHA256("Message").toString();
 }
 
