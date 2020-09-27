@@ -116,7 +116,7 @@
     "arguments": {
       "$phoneNumber": {
         "src": "/Users/dekaulitz/projects/webcoffee/config/scripts/phonenumber.js",
-        "lang": ""
+        "lang": "js"
       }
     },
     "coffeeTest": {

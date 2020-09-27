@@ -14,8 +14,10 @@ import com.github.dekaulitz.webcoffee.models.runner.WebCoffeeTestRequest;
 import com.github.dekaulitz.webcoffee.models.runner.WebCoffeeThenRequest;
 import com.github.dekaulitz.webcoffee.models.runner.WebCoffeeThenRequest.Expect;
 import com.github.dekaulitz.webcoffee.models.spec.WebCoffeeSpecs;
+import com.github.dekaulitz.webcoffee.scriptEngine.ScriptFactory.Lang;
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 
 public class WebCoffeeRunnerParser {
 
@@ -99,8 +101,11 @@ public class WebCoffeeRunnerParser {
       arguments.fields().forEachRemaining(nodeEntry -> {
         String argumentKey = nodeEntry.getKey();
         WebCoffeeArgumentsRunner webCoffeeArgumentsRunner = new WebCoffeeArgumentsRunner();
-        webCoffeeArgumentsRunner
-            .setLang(NodeHelper.getNodeString((ObjectNode) nodeEntry.getValue(), "lang", false));
+        String lang = NodeHelper.getNodeString((ObjectNode) nodeEntry.getValue(), "lang", false);
+        if (StringUtils.isNoneEmpty(lang)) {
+          webCoffeeArgumentsRunner
+              .setLang(Lang.getLang(lang));
+        }
         webCoffeeArgumentsRunner
             .setSrc(NodeHelper.getNodeString((ObjectNode) nodeEntry.getValue(), "src", false));
         webCoffeeArgumentsRunner.setArgumentName(argumentKey);

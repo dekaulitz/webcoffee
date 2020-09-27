@@ -5,15 +5,22 @@ import com.github.dekaulitz.webcoffee.models.runner.WebCoffeeArgumentsRunner;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import javax.script.Invocable;
-import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-public class ScriptEngineFactory {
+public class JavaScriptEngine implements ScriptEngine {
 
-  public static Object execute(final WebCoffeeArgumentsRunner argument) {
+  private final WebCoffeeArgumentsRunner argument;
+
+  public JavaScriptEngine(
+      WebCoffeeArgumentsRunner argument) {
+    this.argument = argument;
+  }
+
+  @Override
+  public Object execute() {
     try {
-      ScriptEngine engine = new ScriptEngineManager().getEngineByName("Nashorn");
+      javax.script.ScriptEngine engine = new ScriptEngineManager().getEngineByName("Nashorn");
       engine.eval(new FileReader(argument.getSrc()));
       Invocable invocable = (Invocable) engine;
       return invocable.invokeFunction(argument.getArgumentName());
