@@ -21,10 +21,12 @@ public class WebCoffeeSpecs {
   //referencing into open api resources pathItem
   private PathItem pathItem;
   private Set<Parameter> parameters;
-  private WebCoffeeSpecsRequestBody requestBody;
+  private WebCoffeeSpecsRequestBodyContent requestBody;
   //open api spec operation
   private Operation operation;
   private String httpMethod;
+  //target endpoint
+  private String endpoint;
 
   @Getter
   @Setter

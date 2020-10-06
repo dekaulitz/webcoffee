@@ -7,14 +7,14 @@ public class WebCoffeeSchema<T> extends Schema<T> {
 
   protected T value;
   protected T $refValue;
-  protected String arguments;
+  protected String argument;
 
-  public String getArguments() {
-    return arguments;
+  public String getArgument() {
+    return argument;
   }
 
-  public void setArguments(String arguments) {
-    this.arguments = arguments;
+  public void setArgument(String argument) {
+    this.argument = argument;
   }
 
   public T getValue() {

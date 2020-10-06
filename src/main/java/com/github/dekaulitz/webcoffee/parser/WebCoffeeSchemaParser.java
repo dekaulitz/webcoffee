@@ -7,7 +7,7 @@ import com.github.dekaulitz.webcoffee.errorHandler.WebCoffeeException;
 import com.github.dekaulitz.webcoffee.helper.NodeHelper;
 import com.github.dekaulitz.webcoffee.models.schema.StringSchema;
 import com.github.dekaulitz.webcoffee.models.schema.WebCoffeeSchema;
-import io.swagger.v3.oas.models.media.Schema;
+
 import io.swagger.v3.parser.util.SchemaTypeUtil;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +21,7 @@ public class WebCoffeeSchemaParser extends SchemaTypeUtil {
   private static final String FORMAT = "format";
   private static final String VALUE = "value";
   private static final String REFVALUE = "$refValue";
-  private static final String argument = "$refValue";
+  private static final String argument = "argument";
 
   public static WebCoffeeSchema createSchemaFromNode(ObjectNode node) throws WebCoffeeException {
     final String type = NodeHelper.getNodeString(node, TYPE, true);
@@ -37,11 +37,11 @@ public class WebCoffeeSchemaParser extends SchemaTypeUtil {
     schema.setTitle(getNodeString("title", false, node));
     ObjectNode propertiesNode = NodeHelper.getObjectNode(node, "properties", false);
     if (propertiesNode != null) {
-      Map<String, Schema> properties = new HashMap<>();
+      Map<String, WebCoffeeSchema> properties = new HashMap<>();
       propertiesNode.fields().forEachRemaining(stringJsonNodeEntry -> {
         final String key = stringJsonNodeEntry.getKey();
         final ObjectNode objectNode = (ObjectNode) stringJsonNodeEntry.getValue();
-        Schema propertySchema = createSchemaFromNode(objectNode);
+        WebCoffeeSchema propertySchema = createSchemaFromNode(objectNode);
         properties.put(key, propertySchema);
       });
       schema.setProperties(properties);
@@ -65,7 +65,7 @@ public class WebCoffeeSchemaParser extends SchemaTypeUtil {
     webCoffeeSchema.setValue(value);
     webCoffeeSchema.set$refValue(refValue);
     webCoffeeSchema.set$refValue(refValue);
-    webCoffeeSchema.setArguments(argumentValue);
+    webCoffeeSchema.setArgument(argumentValue);
     return webCoffeeSchema;
   }
 }

@@ -12,8 +12,7 @@ import com.github.dekaulitz.webcoffee.models.WebCoffee;
 import com.github.dekaulitz.webcoffee.models.WebCoffeeResources;
 import com.github.dekaulitz.webcoffee.models.spec.WebCoffeeSpecs;
 import com.github.dekaulitz.webcoffee.models.spec.WebCoffeeSpecs.PathItem;
-import com.github.dekaulitz.webcoffee.models.spec.WebCoffeeSpecsRequestBody;
-import com.github.dekaulitz.webcoffee.models.spec.WebCoffeeSpecsRequestBodyContentRequest;
+import com.github.dekaulitz.webcoffee.models.spec.WebCoffeeSpecsRequestBodyContent;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.media.Schema;
 import java.lang.reflect.InvocationTargetException;
@@ -46,11 +45,12 @@ public class WebCoffeeSpecParser {
     WebCoffeeSpecs.PathItem pathItem = new PathItem();
     pathItem.set$ref(getNodeString(pathNode, "$ref", true));
     webCoffeeSpecs.setPathItem(pathItem);
+    ReferenceHandler referenceHandler = ReferenceHandler
+        .getReference(webCoffeeSpecs.getPathItem().get$ref());
+    webCoffeeSpecs.setEndpoint(referenceHandler.getPath());
     webCoffeeSpecs
         .setParameters(WebCoffeeParameterParser
             .getParameters(NodeHelper.getArrayNode(value, "parameters", false)));
-    ReferenceHandler referenceHandler = ReferenceHandler
-        .getReference(webCoffeeSpecs.getPathItem().get$ref());
     webCoffeeSpecs.setOperation(getPathOperation(referenceHandler, webCoffee));
     webCoffeeSpecs.setHttpMethod(referenceHandler.getHttpMethod());
     webCoffeeSpecs.setRequestBody(
@@ -58,26 +58,18 @@ public class WebCoffeeSpecParser {
     return webCoffeeSpecs;
   }
 
-  private WebCoffeeSpecsRequestBody getRequestBody(ObjectNode content, WebCoffee webCoffee) {
-    WebCoffeeSpecsRequestBody webCoffeeRequestBody = new WebCoffeeSpecsRequestBody();
-    ObjectNode objectNode = NodeHelper.getObjectNode(content, "content", true);
-    objectNode.fields().forEachRemaining(nodeEntry -> {
-      final String contentKey = nodeEntry.getKey();
-      Map<String, WebCoffeeSpecsRequestBodyContentRequest> requestBodyContent = new HashMap<>();
-      WebCoffeeSpecsRequestBodyContentRequest webCoffeeSpecsRequestBodyContentRequest = new WebCoffeeSpecsRequestBodyContentRequest();
-      ReferenceHandler referenceHandler = ReferenceHandler
-          .getReference(NodeHelper.getNodeString((ObjectNode) nodeEntry.getValue(), "$ref", true));
-      webCoffeeSpecsRequestBodyContentRequest
-          .set$ref(referenceHandler.getReference());
-      webCoffeeSpecsRequestBodyContentRequest
-          .setSchema(getSchema(referenceHandler, webCoffee));
-      webCoffeeSpecsRequestBodyContentRequest.setPayload(
-          WebCoffeeSchemaParser.createSchemaFromNode(
-              NodeHelper.getObjectNode(nodeEntry.getValue(), "payload", true)));
-      requestBodyContent.put(contentKey, webCoffeeSpecsRequestBodyContentRequest);
-      webCoffeeRequestBody.setContent(requestBodyContent);
-    });
-    return webCoffeeRequestBody;
+  private WebCoffeeSpecsRequestBodyContent getRequestBody(ObjectNode content, WebCoffee webCoffee) {
+    WebCoffeeSpecsRequestBodyContent webCoffeeSpecsRequestBodyContent = new WebCoffeeSpecsRequestBodyContent();
+    ReferenceHandler referenceHandler = ReferenceHandler
+        .getReference(NodeHelper.getNodeString((ObjectNode) content, "$ref", true));
+    webCoffeeSpecsRequestBodyContent.set$ref(referenceHandler.getReference());
+    webCoffeeSpecsRequestBodyContent
+        .setMediaType(NodeHelper.getNodeString(content, "mediaType", true));
+    webCoffeeSpecsRequestBodyContent.setSchema(getSchema(referenceHandler, webCoffee));
+    webCoffeeSpecsRequestBodyContent.setPayload(
+        WebCoffeeSchemaParser.createSchemaFromNode(
+            NodeHelper.getObjectNode(content, "payload", true)));
+    return webCoffeeSpecsRequestBodyContent;
   }
 
 

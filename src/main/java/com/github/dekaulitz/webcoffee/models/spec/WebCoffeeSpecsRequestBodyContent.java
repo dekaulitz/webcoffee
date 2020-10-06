@@ -1,5 +1,6 @@
 package com.github.dekaulitz.webcoffee.models.spec;
 
+import com.github.dekaulitz.webcoffee.models.schema.WebCoffeeSchema;
 import io.swagger.v3.oas.models.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,11 +15,12 @@ import lombok.ToString;
 @Setter
 @Builder
 @ToString
-public class WebCoffeeSpecsRequestBodyContentRequest {
+public class WebCoffeeSpecsRequestBodyContent {
 
+  private String mediaType;
   private String $ref;
   private Schema schema;
-  private Schema payload;
+  private WebCoffeeSchema payload;
 
   public String get$ref() {
     return $ref;

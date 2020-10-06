@@ -16,5 +16,5 @@ import lombok.ToString;
 @ToString(callSuper = true)
 public class WebCoffeeSpecsRequestBody {
 
-  private Map<String, WebCoffeeSpecsRequestBodyContentRequest> content;
+  private Map<String, WebCoffeeSpecsRequestBodyContent> content;
 }

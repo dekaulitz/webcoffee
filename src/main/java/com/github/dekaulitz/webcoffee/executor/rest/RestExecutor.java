@@ -2,7 +2,6 @@ package com.github.dekaulitz.webcoffee.executor.rest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.dekaulitz.webcoffee.errorHandler.WebCoffeeException;
-import com.github.dekaulitz.webcoffee.executor.base.CoffeeExecutor;
 import com.github.dekaulitz.webcoffee.models.runner.WebCoffeeRunnerEnv;
 import com.github.dekaulitz.webcoffee.models.spec.WebCoffeeSpecs;
 import java.util.HashMap;
@@ -10,7 +9,7 @@ import java.util.Map;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
-public class RestExecutor implements CoffeeExecutor {
+public class RestExecutor {
 
   protected final Map<String, Map<String, Object>> extractResBody = new HashMap<>();
   protected String mediaType = "application/json";
@@ -29,9 +28,9 @@ public class RestExecutor implements CoffeeExecutor {
     this.usecase = usecase;
   }
 
-  @Override
+
   public void setEnvironment(WebCoffeeRunnerEnv runner) {
-    this.host = runner.getHostname();
+    this.host = runner.getHost();
     this.environment = runner.getEnvironment();
   }
 
@@ -39,7 +38,7 @@ public class RestExecutor implements CoffeeExecutor {
    * @return
    * @throws WebCoffeeException
    */
-  @Override
+
   public RestExecutor execute() throws WebCoffeeException {
 //    this.requestBuilder = new RequestBuilder(this.webCoffeeSpecs);
     this.requestBuilder.setMediaType(this.mediaType);
@@ -48,7 +47,7 @@ public class RestExecutor implements CoffeeExecutor {
     return this;
   }
 
-  @Override
+
   public void validate() throws WebCoffeeException, JsonProcessingException {
 //    WebCoffeeExpect expect = this.webCoffeeSpecs.getExpect();
 //    Response response = this.requestBuilder

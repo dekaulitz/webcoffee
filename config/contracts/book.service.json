@@ -2107,6 +2107,9 @@
             "type": "integer",
             "format": "int32"
           }
+        },
+        "xml": {
+          "name": "image"
         }
       },
       "BOOKS_MODEL": {
@@ -2126,45 +2129,30 @@
             "type": "array",
             "items": {
               "type": "string"
+            },
+            "xml": {
+              "wrapped": true
             }
           },
           "images": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/IMAGES_MODEL"
+            },
+            "xml": {
+              "wrapped": true
             }
           },
           "publisher": {
-            "type": "object",
-            "properties": {
-              "url": {
-                "type": "string"
-              }
-            }
+            "type": "string"
           },
           "publishedDate": {
             "type": "string",
             "format": "date-time"
           }
-        }
-
-      },
-      "LIST_BOOKS": {
-        "type": "array",
-        "items": {
-         "type": "object",
-          "properties": {
-            "id": {
-              "type": "integer",
-              "format": "int64"
-            },
-            "title": {
-              "type": "string"
-            },
-            "author": {
-              "type": "string"
-            }
-          }
+        },
+        "xml": {
+          "name": "book"
         }
       },
       "BOOKS_DELETED": {
@@ -2187,9 +2175,6 @@
       "HEADERS_CLIENT": {
         "name": "client-id",
         "in": "header",
-        "schema": {
-          "type": "string"
-        },
         "required": true
       },
       "BOOK_ID": {

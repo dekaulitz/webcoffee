@@ -17,8 +17,8 @@ import lombok.ToString;
 public class WebCoffeeRunnerEnv {
 
   private String environment;
-  private String applicationType;
-  private String hostname;
+  private String mode;
+  private String host;
   //global arguments
   private Map<String, WebCoffeeArgumentsRunner> arguments;
   private Map<String, WebCoffeeTestRequest> coffeeTest;

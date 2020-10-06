@@ -33,11 +33,12 @@ public class WebCoffeeRunnerParser {
   public WebCoffeeRunnerEnv getRunner(
       Map<String, WebCoffeeEnvironmentInfo> environment) {
     WebCoffeeRunnerEnv webCoffeeRunnerEnv = new WebCoffeeRunnerEnv();
+    webCoffeeRunnerEnv.setMode(NodeHelper.getNodeString(runner, "mode", true));
     webCoffeeRunnerEnv.setEnvironment(NodeHelper.getNodeString(runner, "environment", true));
     WebCoffeeEnvironmentInfo webCoffeeEnvironmentInfo = environment
         .get(webCoffeeRunnerEnv.getEnvironment());
     if (webCoffeeEnvironmentInfo != null) {
-      webCoffeeRunnerEnv.setHostname(environment.get(webCoffeeRunnerEnv.getEnvironment()).getUrl());
+      webCoffeeRunnerEnv.setHost(environment.get(webCoffeeRunnerEnv.getEnvironment()).getUrl());
     }
     webCoffeeRunnerEnv
         .setArguments(getArguments(NodeHelper.getObjectNode(runner, "arguments", false)));
