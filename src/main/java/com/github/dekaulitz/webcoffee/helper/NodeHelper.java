@@ -32,10 +32,10 @@ public class NodeHelper {
     return result;
   }
 
-  public static boolean getBooleanNode(ObjectNode jsonNode, String key, Boolean required) {
+  public static Boolean getBooleanNode(ObjectNode jsonNode, String key, Boolean required) {
     JsonNode result = jsonNode.get(key);
     isRequired(result, key, required);
-    return result.asBoolean();
+    return result != null && result.asBoolean();
   }
 
   private static void isRequired(Object isNull, String key, Boolean required) {

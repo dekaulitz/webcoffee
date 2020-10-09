@@ -1,0 +1,184 @@
+{
+  "webCoffee": "1",
+  "info": {
+    "title": "Scenario do test login and get profile",
+    "version": "v1.0"
+  },
+  "environment": {
+    "production": {
+      "url": "",
+      "description": ""
+    },
+    "development": {
+      "url": "http://localhost:7070/mocks/mocking/5f807a80f933a33697fa5c7f?path=",
+      "description": ""
+    }
+  },
+  "resources": {
+    "auth": {
+      "path": "/Users/dekaulitz/projects/webcoffee/config/contracts/auth.json",
+      "externalDocs": {
+        "description": "authentication contract"
+      }
+    }
+  },
+  "specs": {
+    "REQUEST_LOGIN": {
+      "pathItem": {
+        "$ref": "resources#auth#paths#/api/login#post"
+      },
+      "parameters": [
+        {
+          "name": "accept",
+          "in": "headers",
+          "value": "application/json"
+        },
+        {
+          "name": "client-id",
+          "in": "headers",
+          "argument": "$clientId"
+        },
+        {
+          "name": "secret",
+          "in": "headers",
+          "argument": "$secret"
+        }
+      ],
+      "requestBody": {
+        "mediaType": "application/json",
+        "$ref": "resources#auth#components#schemas#LOGIN_REQUEST",
+        "payload": {
+          "type": "object",
+          "properties": {
+            "email": {
+              "type": "string",
+              "argument": "$email"
+            },
+            "password": {
+              "type": "string",
+              "argument": "$password"
+            }
+          }
+        }
+      }
+    },
+    "GET_PROFILE": {
+      "pathItem": {
+        "$ref": "resources#auth#paths#/api/profile#get"
+      },
+      "parameters": [
+        {
+          "name": "accept",
+          "in": "headers",
+          "value": "application/json"
+        },
+        {
+          "name": "client-id",
+          "in": "headers",
+          "argument": "$clientId"
+        },
+        {
+          "name": "Authorization",
+          "in": "headers",
+          "prefix": "Bearer ",
+          "from": {
+            "$ref": "specs#REQUEST_LOGIN",
+            "value": "accessToken"
+          }
+        },
+        {
+          "name": "secret",
+          "in": "headers",
+          "argument": "$secret"
+        }
+      ]
+    }
+  },
+  "runner": {
+    "mode": "restApi",
+    "environment": "development",
+    "arguments": {
+      "$clientId": {
+        "src": "/Users/dekaulitz/projects/webcoffee/config/scripts/scripts.js",
+        "lang": "js"
+      },
+      "$email": {
+        "src": "/Users/dekaulitz/projects/webcoffee/config/scripts/scripts.js",
+        "lang": "js"
+      },
+      "$password": {
+        "src": "/Users/dekaulitz/projects/webcoffee/config/scripts/scripts.js",
+        "lang": "js"
+      },
+      "$secret": {
+        "src": "/Users/dekaulitz/projects/webcoffee/config/scripts/scripts.js",
+        "lang": "js"
+      }
+    },
+    "coffeeTest": {
+      "LOGIN_SUCCESS": {
+        "do": {
+          "$ref": "specs#REQUEST_LOGIN",
+          "then": {
+            "expect": {
+              "httpStatus": 200,
+              "parameters": [
+                {
+                  "name": "x-request-id",
+                  "in": "header",
+                  "required": true
+                },
+                {
+                  "name": "x-limiting",
+                  "in": "header",
+                  "argument": "$limiting"
+                }
+              ],
+              "response": {
+                "type": "object",
+                "properties": {
+                  "accessToken": {
+                    "type": "string",
+                    "required": true
+                  }
+                }
+              },
+              "do": {
+                "$ref": "specs#GET_PROFILE",
+                "then": {
+                  "expect": {
+                    "httpStatus": 200,
+                    "do": {
+                      "$ref": "specs#GET_PROFILE",
+                      "then": {
+                        "expect": {
+                          "httpStatus": 200
+                        },
+                        "do": {
+                          "$ref": "specs#GET_PROFILE",
+                          "then": {
+                            "expect": {
+                              "httpStatus": 200
+                            },
+                            "do": {
+                              "$ref": "specs#GET_PROFILE",
+                              "then": {
+                                "expect": {
+                                  "httpStatus": 200
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

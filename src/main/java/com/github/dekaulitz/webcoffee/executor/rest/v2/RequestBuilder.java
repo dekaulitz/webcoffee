@@ -1,5 +1,6 @@
 package com.github.dekaulitz.webcoffee.executor.rest.v2;
 
+import com.github.dekaulitz.webcoffee.executor.helper.ExecutorHelper;
 import com.github.dekaulitz.webcoffee.models.parameters.Parameter;
 import com.github.dekaulitz.webcoffee.models.runner.WebCoffeeArgumentsRunner;
 import com.github.dekaulitz.webcoffee.models.runner.WebCoffeeDoRequest;
@@ -29,6 +30,8 @@ public class RequestBuilder {
   private String httpMethod;
   private Set<Parameter> parameters;
   private WebCoffeeSpecsRequestBodyContent requestBody;
+  @Setter
+  private Map<String, Map<String, Object>> globalResponse = new HashMap<>();
   @Getter
   private ValidatableResponse validateResponse;
 
@@ -41,38 +44,50 @@ public class RequestBuilder {
         .getRequestBody();
     return requestBuilder;
   }
-
   public void createRequest() {
-    requestSpecification.given().log().all();
+    requestSpecification.given()
+        .log().all();
     if (parameters.size() != 0) {
       parameters.forEach(parameter -> {
-        String arguments = "";
+        String value = "";
         if (!StringUtils.isBlank(parameter.getValue())) {
-          arguments = parameter.getValue();
+          value = parameter.getValue();
         } else {
-          if (StringUtils.isNoneEmpty(parameter.getArgument())) {
-            arguments = (String) this.arguments.get(parameter.getArgument()).getValue();
+          if (!StringUtils.isBlank(parameter.getArgument())) {
+            value = ExecutorHelper
+                .getArgumentValue(parameter.getArgument(), globalArguments, arguments);
           }
         }
+        if (!globalResponse.isEmpty()) {
+          if (parameter.getFrom() != null) {
+            Map<String, Object> globalResponseRef = globalResponse
+                .get(parameter.getFrom().get$ref());
+            if (globalResponseRef != null) {
+              value = (String) globalResponseRef.get(parameter.getFrom().getValue());
+            }
+          }
+        }
+        value = ExecutorHelper.getPreSuffix(parameter.getPrefix(), parameter.getSuffix(), value);
         if (parameter.getIn().equals("headers")) {
-          requestSpecification.header(parameter.getName(), arguments);
+          requestSpecification.header(parameter.getName(), value);
         } else if (parameter.getIn().equals("query")) {
-          requestSpecification.queryParam(parameter.getName(), arguments);
+          requestSpecification.queryParam(parameter.getName(), value);
         } else if (parameter.getIn().equals("path")) {
-          requestSpecification.pathParam(parameter.getName(), arguments);
+          requestSpecification.pathParam(parameter.getName(), value);
         }
       });
     }
     if (requestBody != null) {
       Map<String, Object> body = new HashMap<>();
-      Map<String, WebCoffeeSchema> payload = requestBody.getPayload().getProperties();
-      for (Map.Entry<String, WebCoffeeSchema> entry : payload.entrySet()) {
+      Map<String, WebCoffeeSchema<?>> payload = requestBody.getPayload().getProperties();
+      for (Map.Entry<String, WebCoffeeSchema<?>> entry : payload.entrySet()) {
         Object value = "";
         if (entry.getValue().getValue() != null) {
           value = entry.getValue().getValue();
         } else {
           if (entry.getValue().getArgument() != null) {
-            value = this.arguments.get(entry.getValue().getArgument()).getValue();
+            value = ExecutorHelper
+                .getArgumentValue(entry.getValue().getArgument(), globalArguments, arguments);
           }
         }
         body.put(entry.getKey(), value);
@@ -85,28 +100,28 @@ public class RequestBuilder {
     requestSpecification.when();
     switch (this.httpMethod) {
       case "get":
-        this.validateResponse = requestSpecification.get(this.host+this.endpoint).then();
+        this.validateResponse = requestSpecification.get(this.host + this.endpoint).then();
         break;
       case "post":
-        this.validateResponse = requestSpecification.post(this.host+this.endpoint).then();
+        this.validateResponse = requestSpecification.post(this.host + this.endpoint).then();
         break;
       case "put":
-        this.validateResponse = requestSpecification.put(this.host+this.endpoint).then();
+        this.validateResponse = requestSpecification.put(this.host + this.endpoint).then();
         break;
       case "options":
-        this.validateResponse = requestSpecification.options(this.host+this.endpoint).then();
+        this.validateResponse = requestSpecification.options(this.host + this.endpoint).then();
         break;
       case "patch":
-        this.validateResponse = requestSpecification.patch(this.host+this.endpoint).then();
+        this.validateResponse = requestSpecification.patch(this.host + this.endpoint).then();
         break;
       case "delete":
-        this.validateResponse = requestSpecification.delete(this.host+this.endpoint).then();
+        this.validateResponse = requestSpecification.delete(this.host + this.endpoint).then();
         break;
       case "head":
-        this.validateResponse = requestSpecification.head(this.host+this.endpoint).then();
+        this.validateResponse = requestSpecification.head(this.host + this.endpoint).then();
         break;
     }
-    this.validateResponse.log().all();
+//    this.validateResponse.log().all();
     return this;
   }
 }

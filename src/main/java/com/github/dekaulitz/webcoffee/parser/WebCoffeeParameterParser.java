@@ -10,6 +10,7 @@ import com.github.dekaulitz.webcoffee.helper.NodeHelper;
 import com.github.dekaulitz.webcoffee.models.parameters.CookieParameter;
 import com.github.dekaulitz.webcoffee.models.parameters.HeaderParameter;
 import com.github.dekaulitz.webcoffee.models.parameters.Parameter;
+import com.github.dekaulitz.webcoffee.models.parameters.ParameterFrom;
 import com.github.dekaulitz.webcoffee.models.parameters.PathParameter;
 import com.github.dekaulitz.webcoffee.models.parameters.QueryParameter;
 import java.util.HashSet;
@@ -47,7 +48,19 @@ public class WebCoffeeParameterParser {
     parameter.setName(NodeHelper.getNodeString((ObjectNode) item, "name", false));
     parameter.setIn(value);
     parameter.setValue(NodeHelper.getNodeString((ObjectNode) item, "value", false));
+    parameter.setPrefix(NodeHelper.getNodeString((ObjectNode) item, "prefix", false));
+    parameter.setSuffix(NodeHelper.getNodeString((ObjectNode) item, "suffix", false));
     parameter.setArgument(NodeHelper.getNodeString((ObjectNode) item, "argument", false));
+    parameter.setRequired(NodeHelper.getBooleanNode((ObjectNode) item, "required", false));
+    ObjectNode parameterFromExists = NodeHelper.getObjectNode(item, "from", false);
+    if (parameterFromExists != null) {
+      ParameterFrom parameterFrom = new ParameterFrom();
+      parameterFrom
+          .set$ref(NodeHelper.getNodeString((ObjectNode) parameterFromExists, "$ref", false));
+      parameterFrom.setValue(
+          NodeHelper.getNodeString((ObjectNode) parameterFromExists, "value", false));
+      parameter.setFrom(parameterFrom);
+    }
     return parameter;
   }
 }

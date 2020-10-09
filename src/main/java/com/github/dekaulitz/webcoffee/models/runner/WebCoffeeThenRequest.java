@@ -28,6 +28,7 @@ public class WebCoffeeThenRequest {
   @Builder
   public static class Expect {
 
+    private Integer httpStatus;
     private Set<Parameter> parameters;
     private WebCoffeeSchema response;
     private WebCoffeeDoRequest doRequest;

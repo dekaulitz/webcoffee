@@ -54,11 +54,14 @@ public class WebCoffeeSpecParser {
     webCoffeeSpecs.setOperation(getPathOperation(referenceHandler, webCoffee));
     webCoffeeSpecs.setHttpMethod(referenceHandler.getHttpMethod());
     webCoffeeSpecs.setRequestBody(
-        getRequestBody(NodeHelper.getObjectNode(value, "requestBody", true), webCoffee));
+        getRequestBody(NodeHelper.getObjectNode(value, "requestBody", false), webCoffee));
     return webCoffeeSpecs;
   }
 
   private WebCoffeeSpecsRequestBodyContent getRequestBody(ObjectNode content, WebCoffee webCoffee) {
+    if (content == null) {
+      return null;
+    }
     WebCoffeeSpecsRequestBodyContent webCoffeeSpecsRequestBodyContent = new WebCoffeeSpecsRequestBodyContent();
     ReferenceHandler referenceHandler = ReferenceHandler
         .getReference(NodeHelper.getNodeString((ObjectNode) content, "$ref", true));

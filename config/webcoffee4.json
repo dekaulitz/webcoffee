@@ -124,7 +124,7 @@
       }
     },
     "coffeeTest": {
-      "requestLogin": {
+      "requestLogin1": {
         "host": "http://localhost:7070/mocks/mocking/5f79d41fa9c3c55b5745af9b?path=",
         "arguments": {
           "$secret": {
@@ -183,6 +183,14 @@
                         "schema": {
                           "type": "string"
                         }
+                      },
+                      {
+                        "name": "x-request-id",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                          "type": "string"
+                        }
                       }
                     ],
                     "response": {
@@ -191,6 +199,290 @@
                         "refId": {
                           "type": "string",
                           "required": true
+                        }
+                      }
+                    },
+                    "do": {
+                      "$ref": "specs#DO_LOGIN",
+                      "then": {
+                        "expect": {
+                          "httpStatus": 200,
+                          "schemaValidation": {
+                            "$ref": "resources#auth#components#schemas#VALIDATE_PASSWORD_RESPONSE"
+                          },
+                          "parameters": [
+                            {
+                              "name": "requestId",
+                              "in": "header",
+                              "required": true,
+                              "schema": {
+                                "type": "string"
+                              }
+                            },
+                            {
+                              "name": "x-request-id",
+                              "in": "header",
+                              "required": true,
+                              "schema": {
+                                "type": "string"
+                              }
+                            }
+                          ],
+                          "response": {
+                            "type": "object",
+                            "properties": {
+                              "refId": {
+                                "type": "string",
+                                "required": true
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "requestLogin2": {
+        "host": "http://localhost:7070/mocks/mocking/5f79d41fa9c3c55b5745af9b?path=",
+        "arguments": {
+          "$secret": {
+            "src": "/Users/dekaulitz/projects/webcoffee/config/scripts/phoneNumber.js",
+            "lang": "js"
+          },
+          "$phoneNumber": {
+            "src": "/Users/dekaulitz/projects/webcoffee/config/scripts/phoneNumber.js",
+            "lang": "js"
+          },
+          "$email": {
+            "src": "/Users/dekaulitz/projects/webcoffee/config/scripts/phoneNumber.js",
+            "lang": "js"
+          }
+        },
+        "do": {
+          "$ref": "specs#REQUEST_LOGIN",
+          "then": {
+            "expect": {
+              "httpStatus": 200,
+              "schemaValidation": {
+                "$ref": "resources#auth#components#schemas#VALIDATE_PASSWORD_RESPONSE"
+              },
+              "parameters": [
+                {
+                  "name": "requestId",
+                  "in": "header",
+                  "required": true,
+                  "schema": {
+                    "type": "string"
+                  }
+                }
+              ],
+              "response": {
+                "type": "object",
+                "properties": {
+                  "refId": {
+                    "type": "string",
+                    "required": true
+                  }
+                }
+              },
+              "do": {
+                "$ref": "specs#DO_LOGIN",
+                "then": {
+                  "expect": {
+                    "httpStatus": 200,
+                    "schemaValidation": {
+                      "$ref": "resources#auth#components#schemas#VALIDATE_PASSWORD_RESPONSE"
+                    },
+                    "parameters": [
+                      {
+                        "name": "requestId",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                          "type": "string"
+                        }
+                      },
+                      {
+                        "name": "x-request-id",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                          "type": "string"
+                        }
+                      }
+                    ],
+                    "response": {
+                      "type": "object",
+                      "properties": {
+                        "refId": {
+                          "type": "string",
+                          "required": true
+                        }
+                      }
+                    },
+                    "do": {
+                      "$ref": "specs#DO_LOGIN",
+                      "then": {
+                        "expect": {
+                          "httpStatus": 200,
+                          "schemaValidation": {
+                            "$ref": "resources#auth#components#schemas#VALIDATE_PASSWORD_RESPONSE"
+                          },
+                          "parameters": [
+                            {
+                              "name": "requestId",
+                              "in": "header",
+                              "required": true,
+                              "schema": {
+                                "type": "string"
+                              }
+                            },
+                            {
+                              "name": "x-request-id",
+                              "in": "header",
+                              "required": true,
+                              "schema": {
+                                "type": "string"
+                              }
+                            }
+                          ],
+                          "response": {
+                            "type": "object",
+                            "properties": {
+                              "refId": {
+                                "type": "string",
+                                "required": true
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "requestLogin31": {
+        "host": "http://localhost:7070/mocks/mocking/5f79d41fa9c3c55b5745af9b?path=",
+        "arguments": {
+          "$secret": {
+            "src": "/Users/dekaulitz/projects/webcoffee/config/scripts/phoneNumber.js",
+            "lang": "js"
+          },
+          "$phoneNumber": {
+            "src": "/Users/dekaulitz/projects/webcoffee/config/scripts/phoneNumber.js",
+            "lang": "js"
+          },
+          "$email": {
+            "src": "/Users/dekaulitz/projects/webcoffee/config/scripts/phoneNumber.js",
+            "lang": "js"
+          }
+        },
+        "do": {
+          "$ref": "specs#REQUEST_LOGIN",
+          "then": {
+            "expect": {
+              "httpStatus": 200,
+              "schemaValidation": {
+                "$ref": "resources#auth#components#schemas#VALIDATE_PASSWORD_RESPONSE"
+              },
+              "parameters": [
+                {
+                  "name": "requestId",
+                  "in": "header",
+                  "required": true,
+                  "schema": {
+                    "type": "string"
+                  }
+                }
+              ],
+              "response": {
+                "type": "object",
+                "properties": {
+                  "refId": {
+                    "type": "string",
+                    "required": true
+                  }
+                }
+              },
+              "do": {
+                "$ref": "specs#DO_LOGIN",
+                "then": {
+                  "expect": {
+                    "httpStatus": 200,
+                    "schemaValidation": {
+                      "$ref": "resources#auth#components#schemas#VALIDATE_PASSWORD_RESPONSE"
+                    },
+                    "parameters": [
+                      {
+                        "name": "requestId",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                          "type": "string"
+                        }
+                      },
+                      {
+                        "name": "x-request-id",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                          "type": "string"
+                        }
+                      }
+                    ],
+                    "response": {
+                      "type": "object",
+                      "properties": {
+                        "refId": {
+                          "type": "string",
+                          "required": true
+                        }
+                      }
+                    },
+                    "do": {
+                      "$ref": "specs#REQUEST_LOGIN",
+                      "then": {
+                        "expect": {
+                          "httpStatus": 200,
+                          "schemaValidation": {
+                            "$ref": "resources#auth#components#schemas#VALIDATE_PASSWORD_RESPONSE"
+                          },
+                          "parameters": [
+                            {
+                              "name": "requestId",
+                              "in": "header",
+                              "required": true,
+                              "schema": {
+                                "type": "string"
+                              }
+                            },
+                            {
+                              "name": "x-request-id",
+                              "in": "header",
+                              "required": true,
+                              "schema": {
+                                "type": "string"
+                              }
+                            }
+                          ],
+                          "response": {
+                            "type": "object",
+                            "properties": {
+                              "refId": {
+                                "type": "string",
+                                "required": true
+                              }
+                            }
+                          }
                         }
                       }
                     }

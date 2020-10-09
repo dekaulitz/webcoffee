@@ -1,6 +1,7 @@
 package com.github.dekaulitz.webcoffee.parser;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.dekaulitz.webcoffee.errorHandler.WebCoffeeValidationExcepton;
 import com.github.dekaulitz.webcoffee.helper.NodeHelper;
@@ -82,10 +83,18 @@ public class WebCoffeeRunnerParser {
     WebCoffeeThenRequest webCoffeeThenRequest = new WebCoffeeThenRequest();
     JsonNode expectNode = NodeHelper.getObjectNode(then, "expect", true);
     Expect expect = new Expect();
-    expect.setParameters(WebCoffeeParameterParser
-        .getParameters(NodeHelper.getArrayNode(expectNode, "parameters", false)));
-    expect.setResponse(WebCoffeeSchemaParser
-        .createSchemaFromNode(NodeHelper.getObjectNode(expectNode, "response", false)));
+    expect.setHttpStatus(NodeHelper.getNodeInteger((ObjectNode) expectNode, "httpStatus", true));
+    ArrayNode nodeParameters = NodeHelper
+        .getArrayNode(expectNode, "parameters", false);
+    if (nodeParameters != null) {
+      expect.setParameters(WebCoffeeParameterParser
+          .getParameters(nodeParameters));
+    }
+    ObjectNode responseNode = NodeHelper.getObjectNode(expectNode, "response", false);
+    if (responseNode != null) {
+      expect.setResponse(WebCoffeeSchemaParser
+          .createSchemaFromNode(responseNode));
+    }
     ObjectNode doRequest = NodeHelper.getObjectNode(expectNode, "do", false);
     if (doRequest != null) {
       WebCoffeeDoRequest webCoffeeDorequest = getDoRequest(doRequest);

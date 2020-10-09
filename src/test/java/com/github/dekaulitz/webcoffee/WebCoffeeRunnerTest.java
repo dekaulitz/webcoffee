@@ -1,15 +1,34 @@
 package com.github.dekaulitz.webcoffee;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.github.dekaulitz.webcoffee.errorHandler.WebCoffeeException;
+import com.github.dekaulitz.webcoffee.executor.CoffeeFactory;
+import com.github.dekaulitz.webcoffee.models.WebCoffee;
+import com.github.dekaulitz.webcoffee.parser.WebCoffeeParser;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
 
 @Log4j2
 class WebCoffeeRunnerTest {
 
-  private static final String path = "/Users/dekaulitz/projects/webcoffee/config/webcoffee.json";
+  private static final String path = "/Users/dekaulitz/projects/webcoffee/config/webcoffee4.json";
 
   @Test
   void cobaString() {
+    System.setProperty("nashorn.args", "--language=es6");
+    log.info("preparing webcoffee ...");
+    try {
+      WebCoffeeParser webCoffeeParser = new WebCoffeeParser().loadContent(path);
+      WebCoffee webCoffee = webCoffeeParser.getWebCoffee();
+      CoffeeFactory coffeeFactory = new CoffeeFactory();
+      long start = System.currentTimeMillis();
+      coffeeFactory.executor(webCoffee.getRunner().getMode())
+          .prepare(webCoffee.getRunner())
+          .execute();
+      System.out.println((System.currentTimeMillis() - start) / 1000);
+    } catch (WebCoffeeException | JsonProcessingException e) {
+      e.printStackTrace();
+    }
   }
 
 //  @Test

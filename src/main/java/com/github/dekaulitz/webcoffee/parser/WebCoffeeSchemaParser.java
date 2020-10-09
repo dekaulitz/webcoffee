@@ -7,7 +7,6 @@ import com.github.dekaulitz.webcoffee.errorHandler.WebCoffeeException;
 import com.github.dekaulitz.webcoffee.helper.NodeHelper;
 import com.github.dekaulitz.webcoffee.models.schema.StringSchema;
 import com.github.dekaulitz.webcoffee.models.schema.WebCoffeeSchema;
-
 import io.swagger.v3.parser.util.SchemaTypeUtil;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,12 +23,8 @@ public class WebCoffeeSchemaParser extends SchemaTypeUtil {
   private static final String argument = "argument";
 
   public static WebCoffeeSchema createSchemaFromNode(ObjectNode node) throws WebCoffeeException {
-    final String type = NodeHelper.getNodeString(node, TYPE, true);
-    final String format = NodeHelper.getNodeString(node, FORMAT, false);
-    final String value = NodeHelper.getNodeString(node, VALUE, false);
-    final String refValue = NodeHelper.getNodeString(node, REFVALUE, false);
-    final String argumentValue = NodeHelper.getNodeString(node, argument, false);
-    return createSchema(createSchema(type, format, value, refValue, argumentValue), node);
+
+    return createSchema(createSchema(node), node);
   }
 
   private static WebCoffeeSchema createSchema(WebCoffeeSchema schema,
@@ -49,8 +44,12 @@ public class WebCoffeeSchemaParser extends SchemaTypeUtil {
     return schema;
   }
 
-  public static WebCoffeeSchema createSchema(String type, String format, String value,
-      String refValue, String argumentValue) {
+  public static WebCoffeeSchema createSchema(ObjectNode node) {
+    final String type = NodeHelper.getNodeString(node, TYPE, true);
+    final String format = NodeHelper.getNodeString(node, FORMAT, false);
+    final String value = NodeHelper.getNodeString(node, VALUE, false);
+    final String refValue = NodeHelper.getNodeString(node, REFVALUE, false);
+    final String argumentValue = NodeHelper.getNodeString(node, argument, false);
     WebCoffeeSchema webCoffeeSchema;
     if (STRING_TYPE.equals(type)) {
       if (StringUtils.isBlank(format)) {
