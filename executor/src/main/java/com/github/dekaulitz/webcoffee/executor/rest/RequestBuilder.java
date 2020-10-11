@@ -65,7 +65,7 @@ public class RequestBuilder {
             JsonNode globalResponseRef = globalResponse
                 .get(parameter.getFrom().get$ref());
             if (globalResponseRef != null) {
-              value = String.valueOf(globalResponseRef.get(parameter.getFrom().getValue()));
+              value = globalResponseRef.get(parameter.getFrom().getValue()).asText();
             }
           }
         }

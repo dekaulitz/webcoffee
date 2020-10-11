@@ -15,6 +15,8 @@ import com.github.dekaulitz.webcoffee.model.runner.WebCoffeeTestRequest;
 import com.github.dekaulitz.webcoffee.model.runner.WebCoffeeThenRequest;
 import com.github.dekaulitz.webcoffee.model.runner.WebCoffeeThenRequest.Expect;
 import com.github.dekaulitz.webcoffee.model.spec.WebCoffeeSpecs;
+import com.github.dekaulitz.webcoffee.openapi.parser.WebCoffeeParameterParser;
+import com.github.dekaulitz.webcoffee.openapi.parser.WebCoffeeSchemaParser;
 import com.github.dekaulitz.webcoffee.scriptengine.ScriptFactory.Lang;
 import java.util.HashMap;
 import java.util.Map;
@@ -53,6 +55,8 @@ public class WebCoffeeRunnerParser {
     coffeeTest.fields().forEachRemaining(nodeEntry -> {
       final String nodeKey = nodeEntry.getKey();
       WebCoffeeTestRequest webCoffeeTestRequest = new WebCoffeeTestRequest();
+      webCoffeeTestRequest
+          .setOrder(NodeHelper.getNodeInteger((ObjectNode) nodeEntry.getValue(), "order", false));
       webCoffeeTestRequest
           .setHost(NodeHelper.getNodeString((ObjectNode) nodeEntry.getValue(), "host", false));
       webCoffeeTestRequest.setArguments(
@@ -100,6 +104,7 @@ public class WebCoffeeRunnerParser {
       WebCoffeeDoRequest webCoffeeDorequest = getDoRequest(doRequest);
       expect.setDoRequest(webCoffeeDorequest);
     }
+    expect.setSchemaValidation(NodeHelper.getBooleanNode((ObjectNode) expectNode, "required", false));
     webCoffeeThenRequest.setExpect(expect);
     return webCoffeeThenRequest;
   }

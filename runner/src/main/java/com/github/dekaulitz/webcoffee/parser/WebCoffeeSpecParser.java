@@ -13,6 +13,8 @@ import com.github.dekaulitz.webcoffee.model.WebCoffeeResources;
 import com.github.dekaulitz.webcoffee.model.spec.WebCoffeeSpecs;
 import com.github.dekaulitz.webcoffee.model.spec.WebCoffeeSpecs.PathItem;
 import com.github.dekaulitz.webcoffee.model.spec.WebCoffeeSpecsRequestBodyContent;
+import com.github.dekaulitz.webcoffee.openapi.parser.WebCoffeeParameterParser;
+import com.github.dekaulitz.webcoffee.openapi.parser.WebCoffeeSchemaParser;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.media.Schema;
 import java.lang.reflect.InvocationTargetException;
@@ -64,7 +66,7 @@ public class WebCoffeeSpecParser {
     }
     WebCoffeeSpecsRequestBodyContent webCoffeeSpecsRequestBodyContent = new WebCoffeeSpecsRequestBodyContent();
     ReferenceHandler referenceHandler = ReferenceHandler
-        .getReference(NodeHelper.getNodeString((ObjectNode) content, "$ref", true));
+        .getReference(NodeHelper.getNodeString(content, "$ref", true));
     webCoffeeSpecsRequestBodyContent.set$ref(referenceHandler.getReference());
     webCoffeeSpecsRequestBodyContent
         .setMediaType(NodeHelper.getNodeString(content, "mediaType", true));

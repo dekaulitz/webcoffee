@@ -19,4 +19,5 @@ public class WebCoffeeTestRequest {
   private String host;
   private Map<String, WebCoffeeArgumentsRunner> arguments;
   private WebCoffeeDoRequest doRequest;
+  private Integer order;
 }

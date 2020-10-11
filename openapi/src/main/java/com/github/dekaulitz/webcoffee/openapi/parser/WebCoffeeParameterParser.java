@@ -1,11 +1,9 @@
-package com.github.dekaulitz.webcoffee.parser;
+package com.github.dekaulitz.webcoffee.openapi.parser;
 
-import static com.github.dekaulitz.webcoffee.helper.WebCoffeeHelper.getNodeString;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.github.dekaulitz.webcoffee.helper.NodeHelper;
 import com.github.dekaulitz.webcoffee.openapi.parameters.CookieParameter;
 import com.github.dekaulitz.webcoffee.openapi.parameters.HeaderParameter;
 import com.github.dekaulitz.webcoffee.openapi.parameters.Parameter;
@@ -31,7 +29,7 @@ public class WebCoffeeParameterParser {
   }
 
   private static Parameter getParameter(JsonNode item) throws RuntimeException {
-    String value = getNodeString("in", true, item);
+    String value = NodeHelper.getNodeString((ObjectNode) item,"in", true);
     Parameter parameter = null;
     if (QUERY_PARAMETER.equals(value)) {
       parameter = new QueryParameter();

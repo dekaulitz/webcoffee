@@ -1,6 +1,6 @@
 package com.github.dekaulitz.webcoffee.openapi.schemas;
 
-public class StringSchema extends WebCoffeeSchema<String> {
+public class ArraySchema extends WebCoffeeSchema<Object> {
 
 
 }

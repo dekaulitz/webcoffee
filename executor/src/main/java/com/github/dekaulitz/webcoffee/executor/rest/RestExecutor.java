@@ -1,20 +1,19 @@
 package com.github.dekaulitz.webcoffee.executor.rest;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.github.dekaulitz.webcoffee.assertations.AssertionsGuardian;
 import com.github.dekaulitz.webcoffee.executor.base.CoffeeExecutor;
 import com.github.dekaulitz.webcoffee.model.runner.WebCoffeeArgumentsRunner;
 import com.github.dekaulitz.webcoffee.model.runner.WebCoffeeDoRequest;
 import com.github.dekaulitz.webcoffee.model.runner.WebCoffeeRunnerEnv;
 import com.github.dekaulitz.webcoffee.model.runner.WebCoffeeTestRequest;
 import com.github.dekaulitz.webcoffee.model.runner.WebCoffeeThenRequest.Expect;
-import com.github.dekaulitz.webcoffee.openapi.schemas.StringSchema;
 import io.restassured.response.Response;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.Assertions;
 
 @Log4j2
 public class RestExecutor implements CoffeeExecutor {
@@ -33,21 +32,20 @@ public class RestExecutor implements CoffeeExecutor {
   }
 
   @Override
-  public void execute() throws RuntimeException {
-    coffeeTest.forEach((s, webCoffeeTestRequest) -> {
-      log.info("starting coffee with use case {}", s);
-      try {
-        this.executeRequest(webCoffeeTestRequest, webCoffeeTestRequest.getDoRequest());
-      } catch (JsonProcessingException e) {
-        e.printStackTrace();
-        throw new RuntimeException(e.getMessage());
-      }
-      log.info("coffee with use case {} finished", s);
-    });
+  public void execute() {
+    coffeeTest.entrySet().stream().sorted(Comparator.comparing(o -> o.getValue().getOrder()))
+        .forEach(webCoffeeTestRequest -> {
+          log.info("starting coffee with use case {}", webCoffeeTestRequest.getKey());
+          this.executeRequest(webCoffeeTestRequest.getValue(),
+              webCoffeeTestRequest.getValue().getDoRequest());
+          log.info("clean up response map ");
+          globalResponse = new HashMap<>();
+          log.info("coffee with use case {} finished", webCoffeeTestRequest.getKey());
+        });
   }
 
   public void executeRequest(final WebCoffeeTestRequest webCoffeeTestRequest,
-      WebCoffeeDoRequest webCoffeeDoRequest) throws JsonProcessingException {
+      WebCoffeeDoRequest webCoffeeDoRequest) {
     log.info("start request {}", webCoffeeDoRequest.getReferenceSpec().getEndpoint());
     final RequestBuilder requestBuilder = RequestBuilder
         .initRequest(webCoffeeDoRequest);
@@ -65,35 +63,16 @@ public class RestExecutor implements CoffeeExecutor {
         .getValidateResponse()
         .log().all()
         .extract().response();
-    JsonNode responseNode =response.getBody().as(JsonNode.class);
-    globalResponse.put(webCoffeeTestRequest.getDoRequest().get$ref(), responseNode);
+    JsonNode responseNode = response.getBody().as(JsonNode.class);
+    globalResponse.put(webCoffeeDoRequest.get$ref(), responseNode);
     final Expect expect = webCoffeeDoRequest.getThen().getExpect();
-    Assertions.assertEquals(response.getStatusCode(), expect.getHttpStatus(),
-        "expect httpStatusCode " + expect.getHttpStatus());
-    if (expect.getParameters() != null) {
-      expect.getParameters().forEach(parameter -> {
-        if (parameter.getIn().equals("header")) {
-          if (parameter.getRequired()) {
-            Assertions.assertNotNull(response.getHeader(parameter.getName()),
-                "expecting " + parameter.getName() + " is not empty");
-          }
-          if (StringUtils.isNoneEmpty(parameter.getValue())) {
-            Assertions.assertEquals(response.getHeader(parameter.getName()), parameter.getValue(),
-                "expecting " + parameter.getName() + " is not empty");
-          }
-        }
-      });
-    }
-    if (expect.getResponse() != null) {
-      expect.getResponse().getProperties().forEach((field, property) -> {
-        if (property instanceof StringSchema) {
-          if(!responseNode.isArray()){
-            Assertions
-                .assertNotNull(responseNode.get(field), "expecting " + field + " is required");
-          }
 
-        }
-      });
+    try {
+      AssertionsGuardian assertionsGuardian = new AssertionsGuardian(expect, response);
+      assertionsGuardian.validate();
+    } catch (AssertionError assertionError) {
+      log.error(assertionError);
+      throw assertionError;
     }
     log.info("finishing request {}", webCoffeeDoRequest.getReferenceSpec().getEndpoint());
     if (expect.getDoRequest() != null) {

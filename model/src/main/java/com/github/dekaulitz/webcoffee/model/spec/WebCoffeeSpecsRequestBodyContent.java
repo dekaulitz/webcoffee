@@ -1,6 +1,5 @@
 package com.github.dekaulitz.webcoffee.model.spec;
 
-
 import com.github.dekaulitz.webcoffee.openapi.schemas.WebCoffeeSchema;
 import io.swagger.v3.oas.models.media.Schema;
 import lombok.AllArgsConstructor;

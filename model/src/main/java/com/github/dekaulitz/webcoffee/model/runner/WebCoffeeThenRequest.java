@@ -1,7 +1,9 @@
 package com.github.dekaulitz.webcoffee.model.runner;
 
+
 import com.github.dekaulitz.webcoffee.openapi.parameters.Parameter;
 import com.github.dekaulitz.webcoffee.openapi.schemas.WebCoffeeSchema;
+import java.util.HashSet;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,8 +31,9 @@ public class WebCoffeeThenRequest {
   public static class Expect {
 
     private Integer httpStatus;
-    private Set<Parameter> parameters;
+    private Set<Parameter> parameters = new HashSet<>();
     private WebCoffeeSchema<?> response;
     private WebCoffeeDoRequest doRequest;
+    private Boolean schemaValidation;
   }
 }

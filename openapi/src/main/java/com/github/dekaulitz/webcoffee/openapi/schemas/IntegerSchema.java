@@ -11,4 +11,5 @@ public class IntegerSchema extends WebCoffeeSchema<Integer> {
   public void setValue(Integer value) {
     this.value = value;
   }
+
 }
