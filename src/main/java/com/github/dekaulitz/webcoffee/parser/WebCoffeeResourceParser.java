@@ -7,7 +7,7 @@ import com.github.dekaulitz.webcoffee.errorHandler.WebCoffeeException;
 import com.github.dekaulitz.webcoffee.helper.FileLoader;
 import com.github.dekaulitz.webcoffee.helper.JsonMapper;
 import com.github.dekaulitz.webcoffee.helper.NodeHelper;
-import com.github.dekaulitz.webcoffee.models.WebCoffeeExternalDocs;
+import com.github.dekaulitz.webcoffee.models.ExternalDocs;
 import com.github.dekaulitz.webcoffee.models.WebCoffeeResources;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -44,8 +44,8 @@ public class WebCoffeeResourceParser {
     return webCoffeeResources;
   }
 
-  private WebCoffeeExternalDocs getWebCoffeeExternalDocs(ObjectNode externalDocs) {
-    WebCoffeeExternalDocs webCoffeeExternalDocs = new WebCoffeeExternalDocs();
+  private ExternalDocs getWebCoffeeExternalDocs(ObjectNode externalDocs) {
+    ExternalDocs webCoffeeExternalDocs = new ExternalDocs();
     if (externalDocs != null) {
       webCoffeeExternalDocs
           .setDescription(NodeHelper.getNodeString(externalDocs, "description", false));

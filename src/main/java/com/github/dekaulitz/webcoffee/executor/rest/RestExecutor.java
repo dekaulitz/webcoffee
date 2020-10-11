@@ -1,93 +1,105 @@
 package com.github.dekaulitz.webcoffee.executor.rest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.github.dekaulitz.webcoffee.errorHandler.WebCoffeeException;
+import com.github.dekaulitz.webcoffee.executor.base.CoffeeExecutor;
+import com.github.dekaulitz.webcoffee.models.runner.WebCoffeeArgumentsRunner;
+import com.github.dekaulitz.webcoffee.models.runner.WebCoffeeDoRequest;
 import com.github.dekaulitz.webcoffee.models.runner.WebCoffeeRunnerEnv;
-import com.github.dekaulitz.webcoffee.models.spec.WebCoffeeSpecs;
+import com.github.dekaulitz.webcoffee.models.runner.WebCoffeeTestRequest;
+import com.github.dekaulitz.webcoffee.models.runner.WebCoffeeThenRequest.Expect;
+import com.github.dekaulitz.webcoffee.models.schema.StringSchema;
+import io.restassured.response.Response;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.Assertions;
 
 @Log4j2
-public class RestExecutor {
+public class RestExecutor implements CoffeeExecutor {
 
-  protected final Map<String, Map<String, Object>> extractResBody = new HashMap<>();
-  protected String mediaType = "application/json";
-  protected RequestBuilder requestBuilder;
-  protected String endpoint;
-  protected String host;
-  protected String method;
-  protected String environment;
-  protected WebCoffeeSpecs webCoffeeSpecs;
-  protected String usecase;
+  private String host;
+  private Map<String, WebCoffeeArgumentsRunner> arguments;
+  private Map<String, WebCoffeeTestRequest> coffeeTest;
+  private Map<String, JsonNode> globalResponse = new HashMap<>();
 
-  public void prepare(String usecase, WebCoffeeSpecs webCoffeeSpecs) throws WebCoffeeException {
-    this.webCoffeeSpecs = webCoffeeSpecs;
-    // this.endpoint = webCoffeeSpecs.getGiven().getPathEndpoint();
-    //this.method = webCoffeeSpecs.getGiven().getHttpMethod();
-    this.usecase = usecase;
-  }
-
-
-  public void setEnvironment(WebCoffeeRunnerEnv runner) {
-    this.host = runner.getHost();
-    this.environment = runner.getEnvironment();
-  }
-
-  /**
-   * @return
-   * @throws WebCoffeeException
-   */
-
-  public RestExecutor execute() throws WebCoffeeException {
-//    this.requestBuilder = new RequestBuilder(this.webCoffeeSpecs);
-    this.requestBuilder.setMediaType(this.mediaType);
-//    this.requestBuilder.given()
-//        .execute(this.method, this.host + endpoint);
+  @Override
+  public RestExecutor prepare(WebCoffeeRunnerEnv webCoffeeRunnerEnv) throws WebCoffeeException {
+    this.host = webCoffeeRunnerEnv.getHost();
+    this.arguments = webCoffeeRunnerEnv.getArguments();
+    this.coffeeTest = webCoffeeRunnerEnv.getCoffeeTest();
     return this;
   }
 
-
-  public void validate() throws WebCoffeeException, JsonProcessingException {
-//    WebCoffeeExpect expect = this.webCoffeeSpecs.getExpect();
-//    Response response = this.requestBuilder
-//        .getValidateResponse().log().all()
-//        .extract().response();
-//    assertThat("status code fallen", response.statusCode(), equalTo(expect.getHttpCode()));
-//    expect.getParameters().stream().filter(Parameter::getRequired)
-//        .forEach(parameter -> {
-//          if (parameter.getIn().equals("header")) {
-//            assertThat("parameter header failing", response.getHeader(parameter.getName()),
-//                notNullValue());
-//          }
-//
-//          if (parameter.getIn().equals("cookie")) {
-//            assertThat("parameter cookie failing", response.getHeader(parameter.getName()),
-//                notNullValue());
-//          }
-//        });
-//    assertThat("media type failing", response.contentType(), equalTo(this.mediaType));
-//    @SuppressWarnings("unchecked")
-//    WebCoffeeSchema webCoffeeSchemaValidation = expect.getContent().get(this.mediaType)
-//        .getExpectValue();
-//    JsonNode nodeResBody = JsonMapper.mapper().readTree(response.getBody().asString());
-//
-//    if (webCoffeeSchemaValidation != null) {
-//      @SuppressWarnings("unchecked")
-//      Map<String, WebCoffeeSchema> webCoffeeSchemaMap = webCoffeeSchemaValidation.getProperties();
-//      webCoffeeSchemaMap.forEach((s, webCoffeeSchema) -> {
-//        assertThat("response body expectation failing", nodeResBody.get(s), notNullValue());
-//        if (webCoffeeSchema.getValue() != "" && webCoffeeSchema.getValue() != null) {
-//          //@TODO create another helper for validate type
-//          assertThat("response body expectation failing", nodeResBody.get(s).asText(),
-//              equalTo(webCoffeeSchema.getValue()));
-//        }
-//      });
-//    }
-//    this.webCoffeeSpecs.getShared()
-//        .put(this.usecase, JsonMapper.mapper().convertValue(nodeResBody, Map.class));
-//    Assert.assertTrue("schema response failing", SchemaValidator
-//        .validateSchema(this.webCoffeeSpecs.getExpect().getContent().get("application/json")
-//            .getRawSchema(), response.body().asString()));
+  @Override
+  public void execute() throws WebCoffeeException {
+    coffeeTest.forEach((s, webCoffeeTestRequest) -> {
+      log.info("starting coffee with use case {}", s);
+      try {
+        this.executeRequest(webCoffeeTestRequest, webCoffeeTestRequest.getDoRequest());
+      } catch (JsonProcessingException e) {
+        e.printStackTrace();
+        throw new WebCoffeeException(e.getMessage());
+      }
+      log.info("coffee with use case {} finished", s);
+    });
   }
+
+  public void executeRequest(final WebCoffeeTestRequest webCoffeeTestRequest,
+      WebCoffeeDoRequest webCoffeeDoRequest) throws JsonProcessingException {
+    log.info("start request {}", webCoffeeDoRequest.getReferenceSpec().getEndpoint());
+    final RequestBuilder requestBuilder = RequestBuilder
+        .initRequest(webCoffeeDoRequest);
+    if (StringUtils.isNoneEmpty(webCoffeeTestRequest.getHost())) {
+      requestBuilder.setHost(webCoffeeTestRequest.getHost());
+    } else if (StringUtils.isNoneEmpty(this.host)) {
+      requestBuilder.setHost(this.host);
+    }
+    requestBuilder.setGlobalResponse(globalResponse);
+    requestBuilder.setGlobalArguments(this.arguments);
+    requestBuilder.setArguments(webCoffeeTestRequest.getArguments());
+    requestBuilder.createRequest();
+    requestBuilder.execute();
+    Response response = requestBuilder
+        .getValidateResponse()
+        .log().all()
+        .extract().response();
+    JsonNode responseNode =response.getBody().as(JsonNode.class);
+    globalResponse.put(webCoffeeTestRequest.getDoRequest().get$ref(), responseNode);
+    final Expect expect = webCoffeeDoRequest.getThen().getExpect();
+    Assertions.assertEquals(response.getStatusCode(), expect.getHttpStatus(),
+        "expect httpStatusCode " + expect.getHttpStatus());
+    if (expect.getParameters() != null) {
+      expect.getParameters().forEach(parameter -> {
+        if (parameter.getIn().equals("header")) {
+          if (parameter.getRequired()) {
+            Assertions.assertNotNull(response.getHeader(parameter.getName()),
+                "expecting " + parameter.getName() + " is not empty");
+          }
+          if (StringUtils.isNoneEmpty(parameter.getValue())) {
+            Assertions.assertEquals(response.getHeader(parameter.getName()), parameter.getValue(),
+                "expecting " + parameter.getName() + " is not empty");
+          }
+        }
+      });
+    }
+    if (expect.getResponse() != null) {
+      expect.getResponse().getProperties().forEach((field, property) -> {
+        if (property instanceof StringSchema) {
+          if(!responseNode.isArray()){
+            Assertions
+                .assertNotNull(responseNode.get(field), "expecting " + field + " is required");
+          }
+
+        }
+      });
+    }
+    log.info("finishing request {}", webCoffeeDoRequest.getReferenceSpec().getEndpoint());
+    if (expect.getDoRequest() != null) {
+      executeRequest(webCoffeeTestRequest, expect.getDoRequest());
+    }
+  }
+
 }

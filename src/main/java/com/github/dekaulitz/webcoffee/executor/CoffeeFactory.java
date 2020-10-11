@@ -2,7 +2,7 @@ package com.github.dekaulitz.webcoffee.executor;
 
 import com.github.dekaulitz.webcoffee.errorHandler.WebCoffeeException;
 import com.github.dekaulitz.webcoffee.executor.base.CoffeeExecutor;
-import com.github.dekaulitz.webcoffee.executor.rest.v2.RestExecutor;
+import com.github.dekaulitz.webcoffee.executor.rest.RestExecutor;
 import lombok.Getter;
 
 public class CoffeeFactory {

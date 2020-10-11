@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 @Log4j2
 class WebCoffeeRunnerTest {
 
-  private static final String path = "/Users/dekaulitz/projects/webcoffee/config/webcoffee4.json";
+  private static final String path = "/Users/dekaulitz/projects/webcoffee/config/config.json";
 
   @Test
   void cobaString() {

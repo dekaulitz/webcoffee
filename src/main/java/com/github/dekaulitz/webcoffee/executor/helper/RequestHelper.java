@@ -4,7 +4,7 @@ import com.github.dekaulitz.webcoffee.models.runner.WebCoffeeArgumentsRunner;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
-public class ExecutorHelper {
+public class RequestHelper {
 
   public static String getArgumentValue(final String argument,
       final Map<String, WebCoffeeArgumentsRunner> globalArgument,

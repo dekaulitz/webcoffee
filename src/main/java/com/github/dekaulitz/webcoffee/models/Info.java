@@ -5,12 +5,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class WebCoffeeExternalDocs {
+@Getter
+@Setter
+public class Info {
 
-  private String description;
-  private String url;
+  private String title;
+  private String version;
 }

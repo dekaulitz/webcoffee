@@ -100,7 +100,8 @@ public class WebCoffeeSpecParser {
     io.swagger.v3.oas.models.PathItem pathItem = webCoffeeResource.getOpenAPI().getPaths()
         .get(referenceHandler.getPath());
     if (pathItem == null) {
-      throw new WebCoffeeValidationExcepton("path operation is null");
+      throw new WebCoffeeValidationExcepton(
+          referenceHandler.getPath() + " its not found on " + referenceHandler.getResourceKey());
     }
     String httpMethod = referenceHandler.getHttpMethod().toLowerCase();
     try {

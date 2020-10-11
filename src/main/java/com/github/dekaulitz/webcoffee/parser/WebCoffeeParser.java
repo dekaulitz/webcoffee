@@ -8,8 +8,8 @@ import com.github.dekaulitz.webcoffee.helper.FileLoader;
 import com.github.dekaulitz.webcoffee.helper.JsonMapper;
 import com.github.dekaulitz.webcoffee.helper.NodeHelper;
 import com.github.dekaulitz.webcoffee.models.WebCoffee;
-import com.github.dekaulitz.webcoffee.models.WebCoffeeEnvironmentInfo;
-import com.github.dekaulitz.webcoffee.models.WebCoffeeInfo;
+import com.github.dekaulitz.webcoffee.models.EnvironmentInfo;
+import com.github.dekaulitz.webcoffee.models.Info;
 import com.github.dekaulitz.webcoffee.models.WebCoffeeResources;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -61,22 +61,22 @@ public class WebCoffeeParser {
     return webCoffeeResourcesMap;
   }
 
-  private Map<String, WebCoffeeEnvironmentInfo> getEnvironment(ObjectNode environment) {
-    Map<String, WebCoffeeEnvironmentInfo> webCoffeeEnvironmentInfoMap = new HashMap<>();
+  private Map<String, EnvironmentInfo> getEnvironment(ObjectNode environment) {
+    Map<String, EnvironmentInfo> webCoffeeEnvironmentInfoMap = new HashMap<>();
     environment.fields().forEachRemaining(nodeEntry -> {
       String environmentString = nodeEntry.getKey();
-      WebCoffeeEnvironmentInfo webCoffeeEnvironmentInfo = new WebCoffeeEnvironmentInfo();
-      webCoffeeEnvironmentInfo
+      EnvironmentInfo environmentInfo = new EnvironmentInfo();
+      environmentInfo
           .setUrl(NodeHelper.getNodeString((ObjectNode) nodeEntry.getValue(), "url", false));
-      webCoffeeEnvironmentInfo.setDescription(
+      environmentInfo.setDescription(
           NodeHelper.getNodeString((ObjectNode) nodeEntry.getValue(), "description", false));
-      webCoffeeEnvironmentInfoMap.put(environmentString, webCoffeeEnvironmentInfo);
+      webCoffeeEnvironmentInfoMap.put(environmentString, environmentInfo);
     });
     return webCoffeeEnvironmentInfoMap;
   }
 
-  private WebCoffeeInfo getWebCoffeeInfo(ObjectNode info) {
-    WebCoffeeInfo webCoffeeInfo = new WebCoffeeInfo();
+  private Info getWebCoffeeInfo(ObjectNode info) {
+    Info webCoffeeInfo = new Info();
     webCoffeeInfo.setVersion(NodeHelper.getNodeString(info, "version", true));
     webCoffeeInfo.setTitle(NodeHelper.getNodeString(info, "title", true));
     return webCoffeeInfo;

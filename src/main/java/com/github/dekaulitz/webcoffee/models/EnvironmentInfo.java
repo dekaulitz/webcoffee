@@ -5,12 +5,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
-public class WebCoffeeInfo {
+@AllArgsConstructor
+@NoArgsConstructor
+public class EnvironmentInfo {
 
-  private String title;
-  private String version;
+  private String url;
+  private String description;
 }

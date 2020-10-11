@@ -30,7 +30,7 @@ public class WebCoffeeThenRequest {
 
     private Integer httpStatus;
     private Set<Parameter> parameters;
-    private WebCoffeeSchema response;
+    private WebCoffeeSchema<?> response;
     private WebCoffeeDoRequest doRequest;
   }
 }

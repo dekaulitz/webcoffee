@@ -16,8 +16,8 @@ import lombok.Setter;
 public class WebCoffee implements Serializable {
 
   private String webCoffee;
-  private WebCoffeeInfo info;
-  private Map<String, WebCoffeeEnvironmentInfo> environment;
+  private Info info;
+  private Map<String, EnvironmentInfo> environment;
   private Map<String, WebCoffeeResources> resources;
   private Map<String, WebCoffeeSpecs> specs;
   private WebCoffeeRunnerEnv runner;

@@ -9,8 +9,8 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class WebCoffeeEnvironmentInfo {
+public class ExternalDocs {
 
-  private String url;
   private String description;
+  private String url;
 }

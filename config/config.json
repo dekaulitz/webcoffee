@@ -92,6 +92,37 @@
           "argument": "$secret"
         }
       ]
+    },
+    "GET_LIST_BOOKS": {
+      "pathItem": {
+        "$ref": "resources#auth#paths#/api/books#get"
+      },
+      "parameters": [
+        {
+          "name": "accept",
+          "in": "headers",
+          "value": "application/json"
+        },
+        {
+          "name": "client-id",
+          "in": "headers",
+          "argument": "$clientId"
+        },
+        {
+          "name": "Authorization",
+          "in": "headers",
+          "prefix": "Bearer ",
+          "from": {
+            "$ref": "specs#REQUEST_LOGIN",
+            "value": "accessToken"
+          }
+        },
+        {
+          "name": "secret",
+          "in": "headers",
+          "argument": "$secret"
+        }
+      ]
     }
   },
   "runner": {
@@ -149,26 +180,10 @@
                   "expect": {
                     "httpStatus": 200,
                     "do": {
-                      "$ref": "specs#GET_PROFILE",
+                      "$ref": "specs#GET_LIST_BOOKS",
                       "then": {
                         "expect": {
                           "httpStatus": 200
-                        },
-                        "do": {
-                          "$ref": "specs#GET_PROFILE",
-                          "then": {
-                            "expect": {
-                              "httpStatus": 200
-                            },
-                            "do": {
-                              "$ref": "specs#GET_PROFILE",
-                              "then": {
-                                "expect": {
-                                  "httpStatus": 200
-                                }
-                              }
-                            }
-                          }
                         }
                       }
                     }

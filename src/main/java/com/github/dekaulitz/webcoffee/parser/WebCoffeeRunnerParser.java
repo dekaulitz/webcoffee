@@ -7,7 +7,7 @@ import com.github.dekaulitz.webcoffee.errorHandler.WebCoffeeValidationExcepton;
 import com.github.dekaulitz.webcoffee.helper.NodeHelper;
 import com.github.dekaulitz.webcoffee.helper.ReferenceHandler;
 import com.github.dekaulitz.webcoffee.models.WebCoffee;
-import com.github.dekaulitz.webcoffee.models.WebCoffeeEnvironmentInfo;
+import com.github.dekaulitz.webcoffee.models.EnvironmentInfo;
 import com.github.dekaulitz.webcoffee.models.runner.WebCoffeeArgumentsRunner;
 import com.github.dekaulitz.webcoffee.models.runner.WebCoffeeDoRequest;
 import com.github.dekaulitz.webcoffee.models.runner.WebCoffeeRunnerEnv;
@@ -32,13 +32,13 @@ public class WebCoffeeRunnerParser {
   }
 
   public WebCoffeeRunnerEnv getRunner(
-      Map<String, WebCoffeeEnvironmentInfo> environment) {
+      Map<String, EnvironmentInfo> environment) {
     WebCoffeeRunnerEnv webCoffeeRunnerEnv = new WebCoffeeRunnerEnv();
     webCoffeeRunnerEnv.setMode(NodeHelper.getNodeString(runner, "mode", true));
     webCoffeeRunnerEnv.setEnvironment(NodeHelper.getNodeString(runner, "environment", true));
-    WebCoffeeEnvironmentInfo webCoffeeEnvironmentInfo = environment
+    EnvironmentInfo environmentInfo = environment
         .get(webCoffeeRunnerEnv.getEnvironment());
-    if (webCoffeeEnvironmentInfo != null) {
+    if (environmentInfo != null) {
       webCoffeeRunnerEnv.setHost(environment.get(webCoffeeRunnerEnv.getEnvironment()).getUrl());
     }
     webCoffeeRunnerEnv

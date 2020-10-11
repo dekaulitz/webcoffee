@@ -14,7 +14,7 @@ import lombok.Setter;
 public class WebCoffeeResources {
 
   private String path;
-  private WebCoffeeExternalDocs externalDocs;
+  private ExternalDocs externalDocs;
   private OpenAPI openAPI;
   private JsonNode openAPINode;
 }
