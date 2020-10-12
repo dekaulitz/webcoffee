@@ -1,7 +1,7 @@
 package com.github.dekaulitz.webcoffee.executor.rest;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.github.dekaulitz.webcoffee.executor.helper.RequestHelper;
+import com.github.dekaulitz.webcoffee.helper.RequestHelper;
 import com.github.dekaulitz.webcoffee.model.runner.WebCoffeeArgumentsRunner;
 import com.github.dekaulitz.webcoffee.model.runner.WebCoffeeDoRequest;
 import com.github.dekaulitz.webcoffee.model.spec.WebCoffeeSpecsRequestBodyContent;

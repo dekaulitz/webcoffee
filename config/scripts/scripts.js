@@ -1,5 +1,5 @@
 const prefix = "+62";
-load("config/scripts/node_modules/crypto-js/crypto-js.js");
+// load("config/scripts/node_modules/crypto-js/crypto-js.js");
 var $phoneNumber = function () {
   return prefix + "" + Math.ceil(Math.random() * 9999999999);
 }
@@ -20,7 +20,7 @@ var $limiting = function () {
 }
 
 var $secret = function () {
-  return CryptoJS.SHA256(randomString(25)).toString();
+  return randomString(25)
 }
 
 function randomString(length) {

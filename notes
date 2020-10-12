@@ -1,0 +1,8 @@
+1. for expect response  will has 2 object
+  a. expectedValue its expected response value by field, we can use schema for differentiate the type of field
+  it will be like this
+  $.0.content:{
+    "type":"string",
+    "value":"1"
+    }
+  b. schema it can be reference from openApi component schema using $ref or directly define the schema it self

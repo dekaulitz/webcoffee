@@ -106,6 +106,12 @@ public class WebCoffeeSchemaParser extends SchemaTypeUtil {
       });
       webCoffeeSchema.setRequired(requiredList);
     }
+    if (node.get("minItems") != null) {
+      webCoffeeSchema.setMinItems(NodeHelper.getNodeInteger(node, "minItems", false));
+    }
+    if (node.get("maxItems") != null) {
+      webCoffeeSchema.setMaxItems(NodeHelper.getNodeInteger(node, "maxItems", false));
+    }
     webCoffeeSchema.setType(type);
     webCoffeeSchema.set$refValue(refValue);
     webCoffeeSchema.set$refValue(refValue);

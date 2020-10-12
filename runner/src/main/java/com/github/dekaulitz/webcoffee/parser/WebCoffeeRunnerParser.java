@@ -1,6 +1,5 @@
 package com.github.dekaulitz.webcoffee.parser;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.dekaulitz.webcoffee.errorHandler.WebCoffeeValidationExcepton;
@@ -14,9 +13,11 @@ import com.github.dekaulitz.webcoffee.model.runner.WebCoffeeRunnerEnv;
 import com.github.dekaulitz.webcoffee.model.runner.WebCoffeeTestRequest;
 import com.github.dekaulitz.webcoffee.model.runner.WebCoffeeThenRequest;
 import com.github.dekaulitz.webcoffee.model.runner.WebCoffeeThenRequest.Expect;
+import com.github.dekaulitz.webcoffee.model.runner.WebCoffeeThenRequest.ExpectResponse;
 import com.github.dekaulitz.webcoffee.model.spec.WebCoffeeSpecs;
 import com.github.dekaulitz.webcoffee.openapi.parser.WebCoffeeParameterParser;
 import com.github.dekaulitz.webcoffee.openapi.parser.WebCoffeeSchemaParser;
+import com.github.dekaulitz.webcoffee.openapi.schemas.WebCoffeeSchema;
 import com.github.dekaulitz.webcoffee.scriptengine.ScriptFactory.Lang;
 import java.util.HashMap;
 import java.util.Map;
@@ -85,9 +86,9 @@ public class WebCoffeeRunnerParser {
 
   private WebCoffeeThenRequest getThenRequest(ObjectNode then) {
     WebCoffeeThenRequest webCoffeeThenRequest = new WebCoffeeThenRequest();
-    JsonNode expectNode = NodeHelper.getObjectNode(then, "expect", true);
+    ObjectNode expectNode = NodeHelper.getObjectNode(then, "expect", true);
     Expect expect = new Expect();
-    expect.setHttpStatus(NodeHelper.getNodeInteger((ObjectNode) expectNode, "httpStatus", true));
+    expect.setHttpStatus(NodeHelper.getNodeInteger(expectNode, "httpStatus", true));
     ArrayNode nodeParameters = NodeHelper
         .getArrayNode(expectNode, "parameters", false);
     if (nodeParameters != null) {
@@ -96,15 +97,30 @@ public class WebCoffeeRunnerParser {
     }
     ObjectNode responseNode = NodeHelper.getObjectNode(expectNode, "response", false);
     if (responseNode != null) {
-      expect.setResponse(WebCoffeeSchemaParser
-          .createSchemaFromNode(responseNode));
+      ExpectResponse expectResponse = new ExpectResponse();
+      ObjectNode responseSchemaNode = NodeHelper.getObjectNode(responseNode, "schema", false);
+      if (responseSchemaNode != null) {
+        expectResponse.setSchema(WebCoffeeSchemaParser
+            .createSchemaFromNode(responseSchemaNode));
+      }
+      ObjectNode expectedResponseValue = NodeHelper
+          .getObjectNode(responseNode, "expectedValue", false);
+      if (expectedResponseValue != null) {
+        Map<String, WebCoffeeSchema<?>> expectedResponseValueMap = new HashMap<>();
+        expectedResponseValue.fields().forEachRemaining(nodeEntry -> {
+          final String nodeKey = nodeEntry.getKey();
+          expectedResponseValueMap.put(nodeKey, WebCoffeeSchemaParser
+              .createSchemaFromNode((ObjectNode) nodeEntry.getValue()));
+        });
+        expectResponse.setExpectedValue(expectedResponseValueMap);
+      }
+      expect.setResponse(expectResponse);
     }
     ObjectNode doRequest = NodeHelper.getObjectNode(expectNode, "do", false);
     if (doRequest != null) {
       WebCoffeeDoRequest webCoffeeDorequest = getDoRequest(doRequest);
       expect.setDoRequest(webCoffeeDorequest);
     }
-    expect.setSchemaValidation(NodeHelper.getBooleanNode((ObjectNode) expectNode, "required", false));
     webCoffeeThenRequest.setExpect(expect);
     return webCoffeeThenRequest;
   }

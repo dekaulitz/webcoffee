@@ -1,4 +1,4 @@
-package com.github.dekaulitz.webcoffee.executor.helper;
+package com.github.dekaulitz.webcoffee.helper;
 
 import com.github.dekaulitz.webcoffee.model.runner.WebCoffeeArgumentsRunner;
 import java.util.Map;
