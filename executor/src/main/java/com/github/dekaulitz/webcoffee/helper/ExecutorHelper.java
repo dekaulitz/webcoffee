@@ -4,7 +4,7 @@ import com.github.dekaulitz.webcoffee.model.runner.WebCoffeeArgumentsRunner;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
-public class RequestHelper {
+public class ExecutorHelper {
 
   public static String getArgumentValue(final String argument,
       final Map<String, WebCoffeeArgumentsRunner> globalArgument,
@@ -35,5 +35,13 @@ public class RequestHelper {
       result = value + suffix;
     }
     return result;
+  }
+
+
+  public static String getEndTime(long endTIme) {
+
+    long minutes = (endTIme / 1000) / 60;
+    long seconds = (endTIme / 1000) % 60;
+    return String.format("finished on %d minutes %d seconds",minutes,seconds);
   }
 }

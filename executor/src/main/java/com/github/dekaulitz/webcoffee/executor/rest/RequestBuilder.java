@@ -1,7 +1,7 @@
 package com.github.dekaulitz.webcoffee.executor.rest;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.github.dekaulitz.webcoffee.helper.RequestHelper;
+import com.github.dekaulitz.webcoffee.helper.ExecutorHelper;
 import com.github.dekaulitz.webcoffee.model.runner.WebCoffeeArgumentsRunner;
 import com.github.dekaulitz.webcoffee.model.runner.WebCoffeeDoRequest;
 import com.github.dekaulitz.webcoffee.model.spec.WebCoffeeSpecsRequestBodyContent;
@@ -56,7 +56,7 @@ public class RequestBuilder {
           value = parameter.getValue();
         } else {
           if (!StringUtils.isBlank(parameter.getArgument())) {
-            value = RequestHelper
+            value = ExecutorHelper
                 .getArgumentValue(parameter.getArgument(), globalArguments, arguments);
           }
         }
@@ -69,7 +69,7 @@ public class RequestBuilder {
             }
           }
         }
-        value = RequestHelper.getPreSuffix(parameter.getPrefix(), parameter.getSuffix(), value);
+        value = ExecutorHelper.getPreSuffix(parameter.getPrefix(), parameter.getSuffix(), value);
         if (parameter.getIn().equals("headers")) {
           requestSpecification.header(parameter.getName(), value);
         } else if (parameter.getIn().equals("query")) {
@@ -88,7 +88,7 @@ public class RequestBuilder {
           value = entry.getValue().getValue();
         } else {
           if (entry.getValue().getArgument() != null) {
-            value = RequestHelper
+            value = ExecutorHelper
                 .getArgumentValue(entry.getValue().getArgument(), globalArguments, arguments);
           }
         }

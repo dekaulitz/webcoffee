@@ -3,10 +3,12 @@ package com.github.dekaulitz.webcoffee.executor.rest;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.dekaulitz.webcoffee.assertations.AssertionsGuardian;
 import com.github.dekaulitz.webcoffee.executor.base.CoffeeExecutor;
+import com.github.dekaulitz.webcoffee.helper.ExecutorHelper;
 import com.github.dekaulitz.webcoffee.model.runner.WebCoffeeArgumentsRunner;
 import com.github.dekaulitz.webcoffee.model.runner.WebCoffeeDoRequest;
 import com.github.dekaulitz.webcoffee.model.runner.WebCoffeeRunnerEnv;
 import com.github.dekaulitz.webcoffee.model.runner.WebCoffeeTestRequest;
+import com.github.dekaulitz.webcoffee.model.runner.WebCoffeeTestRequest.StatusTest;
 import com.github.dekaulitz.webcoffee.model.runner.WebCoffeeThenRequest.Expect;
 import io.restassured.response.Response;
 import java.util.Comparator;
@@ -35,9 +37,14 @@ public class RestExecutor implements CoffeeExecutor {
   public void execute() {
     coffeeTest.entrySet().stream().sorted(Comparator.comparing(o -> o.getValue().getOrder()))
         .forEach(webCoffeeTestRequest -> {
+          WebCoffeeTestRequest testRequest = webCoffeeTestRequest.getValue();
+          testRequest.setStartTime(System.currentTimeMillis());
           log.info("starting coffee with use case {}", webCoffeeTestRequest.getKey());
-          this.executeRequest(webCoffeeTestRequest.getValue(),
-              webCoffeeTestRequest.getValue().getDoRequest());
+          this.executeRequest(testRequest,
+              testRequest.getDoRequest());
+          testRequest.setStatus(StatusTest.SUCCESS);
+          testRequest.setExecutionTime(
+              ExecutorHelper.getEndTime(testRequest.getEndTime()));
           log.info("clean up response map ");
           globalResponse = new HashMap<>();
           log.info("coffee with use case {} finished", webCoffeeTestRequest.getKey());
@@ -68,10 +75,15 @@ public class RestExecutor implements CoffeeExecutor {
     final Expect expect = webCoffeeDoRequest.getThen().getExpect();
 
     try {
-      AssertionsGuardian assertionsGuardian = new AssertionsGuardian(expect, response);
+      AssertionsGuardian assertionsGuardian = new AssertionsGuardian(
+          webCoffeeDoRequest.getReferenceSpec().getHttpMethod() + "#" + webCoffeeDoRequest
+              .getReferenceSpec()
+              .getEndpoint(), expect, response);
       assertionsGuardian.validate();
     } catch (AssertionError assertionError) {
-      log.error(assertionError);
+      webCoffeeTestRequest.setStatus(StatusTest.FAIL);
+      webCoffeeTestRequest
+          .setExecutionTime(ExecutorHelper.getEndTime(webCoffeeTestRequest.getEndTime()));
       throw assertionError;
     }
     log.info("finishing request {}", webCoffeeDoRequest.getReferenceSpec().getEndpoint());

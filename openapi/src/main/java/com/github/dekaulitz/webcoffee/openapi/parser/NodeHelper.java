@@ -17,7 +17,7 @@ public class NodeHelper {
   public static Integer getNodeInteger(ObjectNode objectNode, String key, Boolean required) {
     JsonNode result = objectNode.get(key);
     isRequired(result, key, required);
-    return result == null ? 0 : result.asInt();
+    return result == null ? null : result.asInt();
   }
 
   public static ObjectNode getObjectNode(JsonNode jsonNode, String key, Boolean required) {

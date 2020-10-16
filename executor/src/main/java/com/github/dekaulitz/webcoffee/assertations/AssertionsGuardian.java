@@ -23,10 +23,12 @@ public class AssertionsGuardian {
 
   private final Expect expect;
   private final Response response;
+  private final String endpoint;
 
-  public AssertionsGuardian(Expect expect, Response response) {
+  public AssertionsGuardian(String endpoint, Expect expect, Response response) {
     this.expect = expect;
     this.response = response;
+    this.endpoint = endpoint;
   }
 
 
@@ -36,24 +38,15 @@ public class AssertionsGuardian {
     this.validateHeaders();
     if (expect.getResponse() != null) {
       JsonNode responseNode = response.getBody().as(JsonNode.class);
-
-      if (!responseNode.isArray()) {
-        if (expect.getResponse().getSchema() != null) {
-          if (!expect.getResponse().getSchema().getRequired().isEmpty()) {
-            expect.getResponse().getSchema().getRequired().forEach(field -> {
-              Assertions
-                  .assertNotNull(responseNode.get(field), "expecting " + field + " is required");
-            });
-          }
-          expect.getResponse().getSchema().getProperties().forEach((s, schema) -> {
-            assertNotNull(responseNode.get(s), "expecting " + s + " is not null");
-            if (!(schema instanceof ArraySchema)) {
-              validateResponse(s, schema, responseNode, false);
-            }
+      if (expect.getResponse().getSchema() != null) {
+        if (!expect.getResponse().getSchema().getRequired().isEmpty()) {
+          expect.getResponse().getSchema().getRequired().forEach(field -> {
+            Assertions
+                .assertNotNull(responseNode.get(field),
+                    this.endpoint + " expecting " + field + " is required");
           });
         }
-      } else {
-        //@TODO handling array
+        validateResponseType(responseNode, expect.getResponse().getSchema());
       }
       if (expect.getResponse().getExpectedValue() != null) {
         expectedResponseValueValidation(responseNode, expect.getResponse().getExpectedValue());
@@ -77,39 +70,59 @@ public class AssertionsGuardian {
           n++;
         }
       }
-      validateResponse(s, webCoffeeSchema, expect, true);
+      validateResponseProperties(s, webCoffeeSchema, expect, true);
     });
   }
 
-  private void validateResponse(String key, Schema schema, JsonNode node,
+  private void validateResponseType(JsonNode node, Schema expectSchema) {
+    if (expectSchema instanceof StringSchema) {
+      assertTrue(node.isTextual(), this.endpoint + " expecting "+node+" response is string");
+    } else if (expectSchema instanceof IntegerSchema) {
+      assertTrue(node.isIntegralNumber(), this.endpoint + " expecting "+node+" response is integer");
+    } else if (expectSchema instanceof BooleanSchema) {
+      assertTrue(node.asBoolean(), this.endpoint + " expecting response "+node+" is boolean");
+    } else if (expectSchema instanceof ArraySchema) {
+      assertTrue(node.isArray(), this.endpoint + " expecting response "+node+" is array");
+      //taking sample from the first response assuming the rest of structure remain same
+      validateResponseType(node.get(0), ((ArraySchema) expectSchema).getItems());
+    } else {
+      expectSchema.getProperties().forEach((s, schema) -> {
+        assertNotNull(node.get(String.valueOf(s)),
+            this.endpoint + " expecting " + s + " is not null");
+        //taking the first array assuming the rest of structure remain same
+        validateResponseProperties(String.valueOf(s), (Schema) schema, node, false);
+      });
+    }
+  }
+
+  private void validateResponseProperties(String key, Schema schema, JsonNode node,
       boolean isExpectedValueResponse) {
     if (schema instanceof StringSchema) {
       if (isExpectedValueResponse) {
-        assertTrue(node.isTextual(), "expecting " + key + " is string");
+        assertTrue(node.isTextual(), this.endpoint + " expecting " + key + " is string");
         if (((StringSchema) schema).getValue() != null) {
-          assertEquals(node.asText(), ((StringSchema) schema).getValue(),
-              "expecting " + key + " is" + ((StringSchema) schema).getValue());
+          assertEquals(((StringSchema) schema).getValue(), node.asText(),
+              this.endpoint + "expecting " + key + " is " + ((StringSchema) schema).getValue());
         }
       } else {
-        assertTrue(node.get(key).isTextual(), "expecting " + key + " is string");
+        assertTrue(node.get(key).isTextual(), this.endpoint + " expecting " + key + " is string");
         if (((StringSchema) schema).getValue() != null) {
           assertEquals(node.get(key).asText(), ((StringSchema) schema).getValue(),
-              "expecting " + key + " is" + ((StringSchema) schema).getValue());
+              this.endpoint + " expecting " + key + " is " + ((StringSchema) schema).getValue());
         }
       }
     } else if (schema instanceof IntegerSchema) {
-
       if (isExpectedValueResponse) {
         assertTrue(node.isIntegralNumber(), "expecting " + key + " is integer");
         if (((IntegerSchema) schema).getValue() != null) {
           assertEquals(((IntegerSchema) schema).getValue(), node.asInt(),
-              "expecting " + key + " is " + ((IntegerSchema) schema).getValue());
+              this.endpoint + " expecting " + key + " is " + ((IntegerSchema) schema).getValue());
         }
       } else {
         assertTrue(node.get(key).isIntegralNumber(), "expecting " + key + " is integer");
         if (((IntegerSchema) schema).getValue() != null) {
           assertEquals(((IntegerSchema) schema).getValue(), node.get(key).asInt(),
-              "expecting " + key + " is " + ((IntegerSchema) schema).getValue());
+              this.endpoint + " expecting " + key + " is " + ((IntegerSchema) schema).getValue());
         }
       }
     } else if (schema instanceof BooleanSchema) {
@@ -117,18 +130,20 @@ public class AssertionsGuardian {
         assertTrue(node.asBoolean(), "expecting " + key + " is boolean");
         if (((BooleanSchema) schema).getValue() != null) {
           assertEquals(((BooleanSchema) schema).getValue(), node.asBoolean(),
-              "expecting " + key + " is " + ((BooleanSchema) schema).getValue());
+              this.endpoint + " expecting " + key + " is " + ((BooleanSchema) schema).getValue());
         }
       } else {
         assertTrue(node.get(key).asBoolean(), "expecting " + key + " is boolean");
         if (((BooleanSchema) schema).getValue() != null) {
           assertEquals(((BooleanSchema) schema).getValue(), node.get(key).asBoolean(),
-              "expecting " + key + " is " + ((BooleanSchema) schema).getValue());
+              this.endpoint + " expecting " + key + " is " + ((BooleanSchema) schema).getValue());
         }
       }
     } else if (schema instanceof ArraySchema) {
-      assertTrue(node.get(key).isArray(), "expecting " + key + " is array");
-      validateResponse(key, ((ArraySchema) schema).getItems(), node.get(key), false);
+      assertTrue(node.get(key).isArray(), this.endpoint + " expecting " + key + " is array");
+      if (node.get(key).has(0)) {
+        validateResponseType(node.get(key).get(0), ((ArraySchema) schema).getItems());
+      }
     }
   }
 

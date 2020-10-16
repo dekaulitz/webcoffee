@@ -184,7 +184,7 @@
     },
     "coffeeTest": {
       "DO_LOGIN_AND_GET_BOOK_DETAIL": {
-        "order": 2,
+        "order": 1,
         "do": {
           "$ref": "specs#REQUEST_LOGIN",
           "then": {
@@ -233,6 +233,92 @@
                   "properties": {
                     "accessToken": {
                       "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "DO_LOGIN_AND_GET_PROFILE": {
+        "order": 2,
+        "do": {
+          "$ref": "specs#REQUEST_LOGIN",
+          "then": {
+            "expect": {
+              "httpStatus": "200",
+              "do": {
+                "$ref": "specs#GET_PROFILE",
+                "then": {
+                  "expect": {
+                    "httpStatus": "200",
+                    "response": {
+                      "expectedValue": {
+                        "id": {
+                          "type": "string",
+                          "value": "123"
+                        },
+                        "username": {
+                          "type": "string",
+                          "value": "root"
+                        }
+                      },
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                          "username": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "DO_LOGIN_AND_GET_LIST_OF_BOOKS": {
+        "order": 2,
+        "do": {
+          "$ref": "specs#REQUEST_LOGIN",
+          "then": {
+            "expect": {
+              "httpStatus": "200",
+              "do": {
+                "$ref": "specs#GET_LIST_BOOKS",
+                "then": {
+                  "expect": {
+                    "httpStatus": "200",
+                    "response": {
+                      "expectedValue": {
+                        "$.0.author": {
+                          "type": "string",
+                          "value": "string"
+                        }
+                      },
+                      "schema": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "integer"
+                            },
+                            "author": {
+                              "type": "string"
+                            },
+                            "category": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
                     }
                   }
                 }

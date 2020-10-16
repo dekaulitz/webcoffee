@@ -1,4 +1,4 @@
-1. for expect response  will has 2 object
+1. for expect response  will has 2 object (done)
   a. expectedValue its expected response value by field, we can use schema for differentiate the type of field
   it will be like this
   $.0.content:{
@@ -6,3 +6,14 @@
     "value":"1"
     }
   b. schema it can be reference from openApi component schema using $ref or directly define the schema it self
+2. create command cli for below:
+  a. consume config file
+  b. consume contract path
+  c. consume profile
+
+3. enable consume contract path base on url with token reference from openapi utils
+4. generate report for failing unit test
+5. has ability for testing web application this is using selenium web browser
+6. has ability for testing app application.
+
+

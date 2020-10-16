@@ -10,15 +10,15 @@ import com.github.dekaulitz.webcoffee.parser.WebCoffeeParser;
 import java.util.Comparator;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.extern.log4j.Log4j2;
+import org.junit.jupiter.api.Test;
 
 @Log4j2
-public class Runner implements Runnable {
+class RunnerTest {
 
   private static final String path = "/Users/dekaulitz/projects/webcoffee/config/config.json";
 
-  public static void main(String[] args) {
-    log.info(args);
-
+  @Test
+  void main() {
     System.setProperty("nashorn.args", "--language=es6");
     log.info("preparing webCoffee ...");
     WebCoffee webCoffee = new WebCoffee();
@@ -52,22 +52,6 @@ public class Runner implements Runnable {
       isSuccess = true;
     }
     log.info("==================================");
-    log.info("webCoffee success: {}", isSuccess);
-
-  }
-
-  /**
-   * When an object implementing interface <code>Runnable</code> is used to create a thread,
-   * starting the thread causes the object's
-   * <code>run</code> method to be called in that separately executing
-   * thread.
-   * <p>
-   * The general contract of the method <code>run</code> is that it may take any action whatsoever.
-   *
-   * @see Thread#run()
-   */
-  @Override
-  public void run() {
-
+    log.info("webCoffee {}", isSuccess);
   }
 }

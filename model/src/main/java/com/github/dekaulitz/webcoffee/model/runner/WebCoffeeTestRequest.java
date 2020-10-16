@@ -20,4 +20,18 @@ public class WebCoffeeTestRequest {
   private Map<String, WebCoffeeArgumentsRunner> arguments;
   private WebCoffeeDoRequest doRequest;
   private Integer order;
+  private StatusTest status = StatusTest.SKIPPED;
+  private long startTime;
+  private long endTime;
+  private String executionTime = "-";
+
+  public long getEndTime() {
+    return System.currentTimeMillis() - startTime;
+  }
+
+  public enum StatusTest {
+    SUCCESS, FAIL, SKIPPED
+  }
+
+
 }
