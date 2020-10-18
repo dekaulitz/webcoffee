@@ -14,11 +14,11 @@ import com.github.dekaulitz.webcoffee.modules.openapi.schemas.WebCoffeeSchema;
 import io.restassured.response.Response;
 import io.swagger.v3.oas.models.media.Schema;
 import java.util.Map;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
 
-@Slf4j
+@Log4j2
 public class AssertionsGuardian {
 
   private final Expect expect;
@@ -33,8 +33,8 @@ public class AssertionsGuardian {
 
 
   public void validate() {
-    assertEquals(response.getStatusCode(), expect.getHttpStatus(),
-        "expect httpStatusCode " + expect.getHttpStatus());
+    assertEquals(expect.getHttpStatus(),response.getStatusCode(),
+        this.endpoint + "expect httpStatusCode " + expect.getHttpStatus());
     this.validateHeaders();
     if (expect.getResponse() != null) {
       JsonNode responseNode = response.getBody().as(JsonNode.class);

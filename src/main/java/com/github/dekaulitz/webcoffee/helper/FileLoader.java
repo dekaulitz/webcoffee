@@ -11,16 +11,16 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
-@Slf4j
+@Log4j2
 public class FileLoader {
 
   public static String loadContent(Path path) throws WebCoffeeException {
     try {
       return new String(Files.readAllBytes(path));
     } catch (IOException e) {
-      throw new WebCoffeeException(e.getMessage());
+      throw new WebCoffeeException(path.getFileName() + " is not found");
     }
   }
 
@@ -40,7 +40,6 @@ public class FileLoader {
               OpenAPI openAPI = parsingIntoOpenApi(contract).getOpenAPI();
               openAPIMap.put(String.valueOf(path.getFileName()), openAPI);
             } catch (WebCoffeeException e) {
-              e.printStackTrace();
               log.error(e.getMessage());
             }
           });

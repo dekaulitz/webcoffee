@@ -8,9 +8,9 @@ import java.io.FileReader;
 import javax.script.Invocable;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
-@Slf4j
+@Log4j2
 public class JavaScriptEngine implements ScriptEngine {
 
   private final WebCoffeeArgumentsRunner argument;

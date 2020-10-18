@@ -14,10 +14,10 @@ import io.restassured.response.Response;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 
-@Slf4j
+@Log4j2
 public class RestExecutor implements CoffeeExecutor {
 
   private String host;
@@ -68,7 +68,7 @@ public class RestExecutor implements CoffeeExecutor {
     requestBuilder.execute();
     Response response = requestBuilder
         .getValidateResponse()
-        .log().all()
+//        .log().all()
         .extract().response();
     JsonNode responseNode = response.getBody().as(JsonNode.class);
     globalResponse.put(webCoffeeDoRequest.get$ref(), responseNode);

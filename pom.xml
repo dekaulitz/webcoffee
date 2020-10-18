@@ -20,6 +20,11 @@
       <version>2.1.1</version>
     </dependency>
     <dependency>
+      <groupId>io.swagger.parser.v3</groupId>
+      <artifactId>swagger-parser</artifactId>
+      <version>2.0.17</version>
+    </dependency>
+    <dependency>
       <groupId>io.rest-assured</groupId>
       <artifactId>rest-assured</artifactId>
       <version>${rest-assured-version}</version>
@@ -44,7 +49,16 @@
       <artifactId>xml-path</artifactId>
       <version>${rest-assured-version}</version>
     </dependency>
-
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
+      <version>2.13.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-api</artifactId>
+      <version>2.13.0</version>
+    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -55,17 +69,16 @@
       <artifactId>junit-jupiter-api</artifactId>
       <version>5.5.2</version>
     </dependency>
-    <dependency>
-      <groupId>io.swagger.parser.v3</groupId>
-      <artifactId>swagger-parser</artifactId>
-      <version>2.0.17</version>
-
-    </dependency>
     <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
-      <version>1.7.30</version>
+      <version>${slfj-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>info.picocli</groupId>
+      <artifactId>picocli</artifactId>
+      <version>${pico-cli-version}</version>
     </dependency>
   </dependencies>
   <packaging>jar</packaging>
@@ -73,6 +86,8 @@
     <java.version>1.8</java.version>
     <rest-assured-version>4.3.1</rest-assured-version>
     <groovy.version>3.0.2</groovy.version>
+    <pico-cli-version>4.5.2</pico-cli-version>
+    <slfj-version>1.7.30</slfj-version>
   </properties>
   <parent>
     <artifactId>spring-boot-starter-parent</artifactId>
@@ -81,11 +96,17 @@
     <version>2.2.3.RELEASE</version> <!-- lookup parent from repository -->
   </parent>
   <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
     <plugins>
       <plugin>
         <artifactId>spring-boot-maven-plugin</artifactId>
         <configuration>
-          <mainClass>com.github.dekaulitz.webcoffee.runner.Runner</mainClass>
+          <mainClass>com.github.dekaulitz.webcoffee.Runner</mainClass>
         </configuration>
         <groupId>org.springframework.boot</groupId>
       </plugin>

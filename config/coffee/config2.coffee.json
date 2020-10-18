@@ -1,0 +1,332 @@
+{
+  "webCoffee": "1",
+  "info": {
+    "title": "Scenario do test login and get profile",
+    "version": "v1.0"
+  },
+  "environment": {
+    "production": {
+      "url": "",
+      "description": ""
+    },
+    "development": {
+      "url": "http://localhost:7070/mocks/mocking/5f807a80f933a33697fa5c7f?path=",
+      "description": ""
+    }
+  },
+  "resources": {
+    "auth": {
+      "path": "/Users/dekaulitz/projects/webcoffee/config/contracts/auth.json",
+      "externalDocs": {
+        "description": "authentication contract"
+      }
+    }
+  },
+  "specs": {
+    "REQUEST_LOGIN": {
+      "pathItem": {
+        "$ref": "resources#auth#paths#/api/login#post"
+      },
+      "parameters": [
+        {
+          "name": "accept",
+          "in": "headers",
+          "value": "application/json"
+        },
+        {
+          "name": "client-id",
+          "in": "headers",
+          "argument": "$clientId"
+        },
+        {
+          "name": "secret",
+          "in": "headers",
+          "argument": "$secret"
+        }
+      ],
+      "requestBody": {
+        "mediaType": "application/json",
+        "$ref": "resources#auth#components#schemas#LOGIN_REQUEST",
+        "payload": {
+          "type": "object",
+          "properties": {
+            "email": {
+              "type": "string",
+              "argument": "$email"
+            },
+            "password": {
+              "type": "string",
+              "argument": "$password"
+            }
+          }
+        }
+      }
+    },
+    "GET_PROFILE": {
+      "pathItem": {
+        "$ref": "resources#auth#paths#/api/profile#get"
+      },
+      "parameters": [
+        {
+          "name": "accept",
+          "in": "headers",
+          "value": "application/json"
+        },
+        {
+          "name": "client-id",
+          "in": "headers",
+          "argument": "$clientId"
+        },
+        {
+          "name": "Authorization",
+          "in": "headers",
+          "prefix": "Bearer ",
+          "from": {
+            "$ref": "specs#REQUEST_LOGIN",
+            "value": "accessToken"
+          }
+        },
+        {
+          "name": "secret",
+          "in": "headers",
+          "argument": "$secret"
+        }
+      ]
+    },
+    "GET_LIST_BOOKS": {
+      "pathItem": {
+        "$ref": "resources#auth#paths#/api/books#get"
+      },
+      "parameters": [
+        {
+          "name": "accept",
+          "in": "headers",
+          "value": "application/json"
+        },
+        {
+          "name": "client-id",
+          "in": "headers",
+          "argument": "$clientId"
+        },
+        {
+          "name": "Authorization",
+          "in": "headers",
+          "prefix": "Bearer ",
+          "from": {
+            "$ref": "specs#REQUEST_LOGIN",
+            "value": "accessToken"
+          }
+        },
+        {
+          "name": "secret",
+          "in": "headers",
+          "argument": "$secret"
+        }
+      ]
+    },
+    "GET_BOOK_DETAIL": {
+      "pathItem": {
+        "$ref": "resources#auth#paths#/api/books/{id}#get"
+      },
+      "parameters": [
+        {
+          "name": "accept",
+          "in": "headers",
+          "value": "application/json"
+        },
+        {
+          "name": "client-id",
+          "in": "headers",
+          "argument": "$clientId"
+        },
+        {
+          "name": "Authorization",
+          "in": "headers",
+          "prefix": "Bearer ",
+          "from": {
+            "$ref": "specs#REQUEST_LOGIN",
+            "value": "accessToken"
+          }
+        },
+        {
+          "name": "secret",
+          "in": "headers",
+          "argument": "$secret"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "value": 2
+        }
+      ]
+    }
+  },
+  "runner": {
+    "mode": "restApi",
+    "environment": "development",
+    "arguments": {
+      "$clientId": {
+        "src": "/Users/dekaulitz/projects/webcoffee/config/scripts/scripts.js",
+        "lang": "js"
+      },
+      "$email": {
+        "src": "/Users/dekaulitz/projects/webcoffee/config/scripts/scripts.js",
+        "lang": "js"
+      },
+      "$password": {
+        "src": "/Users/dekaulitz/projects/webcoffee/config/scripts/scripts.js",
+        "lang": "js"
+      },
+      "$secret": {
+        "src": "/Users/dekaulitz/projects/webcoffee/config/scripts/scripts.js",
+        "lang": "js"
+      }
+    },
+    "coffeeTest": {
+      "DO_LOGIN_AND_GET_BOOK_DETAIL": {
+        "order": 1,
+        "do": {
+          "$ref": "specs#REQUEST_LOGIN",
+          "then": {
+            "expect": {
+              "httpStatus": 200,
+              "parameters": [
+                {
+                  "name": "x-request-id",
+                  "in": "header",
+                  "required": true
+                },
+                {
+                  "name": "x-limiting",
+                  "in": "header",
+                  "argument": "$limiting"
+                }
+              ],
+              "response": {
+                "expectedValue": {
+                  "accessToken": {
+                    "type": "string",
+                    "value": "123321"
+                  },
+                  "accessList.$.1": {
+                    "type": "string",
+                    "value": "WRITE"
+                  },
+                  "books.$.0.id": {
+                    "type": "integer",
+                    "value": 1
+                  },
+                  "books.$.1.id": {
+                    "type": "integer",
+                    "value": "2"
+                  },
+                  "books.$.0.category.$.0": {
+                    "type": "string",
+                    "value": "string"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "accessToken"
+                  ],
+                  "properties": {
+                    "accessToken": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "DO_LOGIN_AND_GET_PROFILE": {
+        "order": 2,
+        "do": {
+          "$ref": "specs#REQUEST_LOGIN",
+          "then": {
+            "expect": {
+              "httpStatus": "200",
+              "do": {
+                "$ref": "specs#GET_PROFILE",
+                "then": {
+                  "expect": {
+                    "httpStatus": "200",
+                    "response": {
+                      "expectedValue": {
+                        "id": {
+                          "type": "string",
+                          "value": "123"
+                        },
+                        "username": {
+                          "type": "string",
+                          "value": "root"
+                        }
+                      },
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                          "username": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "DO_LOGIN_AND_GET_LIST_OF_BOOKS": {
+        "order": 2,
+        "do": {
+          "$ref": "specs#REQUEST_LOGIN",
+          "then": {
+            "expect": {
+              "httpStatus": "200",
+              "do": {
+                "$ref": "specs#GET_LIST_BOOKS",
+                "then": {
+                  "expect": {
+                    "httpStatus": "200",
+                    "response": {
+                      "expectedValue": {
+                        "$.0.author": {
+                          "type": "string",
+                          "value": "string"
+                        }
+                      },
+                      "schema": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "integer"
+                            },
+                            "author": {
+                              "type": "string"
+                            },
+                            "category": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

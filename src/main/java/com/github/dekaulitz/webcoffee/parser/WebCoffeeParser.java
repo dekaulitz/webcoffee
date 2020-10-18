@@ -15,9 +15,9 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
-@Slf4j
+@Log4j2
 public class WebCoffeeParser {
 
   @Getter

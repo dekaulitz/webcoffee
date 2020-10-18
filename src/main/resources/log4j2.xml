@@ -2,7 +2,8 @@
 <Configuration status="WARN">
   <Appenders>
     <Console name="Console" target="SYSTEM_OUT">
-      <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+      <PatternLayout
+        pattern="%highlight{%d{HH:mm:ss.SSS} [coffee-runner] %-5level %logger{3} : %msg%n}{FATAL=red bold, ERROR=red bold}"/>
     </Console>
   </Appenders>
   <Loggers>

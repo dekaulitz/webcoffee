@@ -1,27 +1,46 @@
 {
   "openapi": "3.0.2",
   "info": {
-    "title": "Scenario do test login and do auth",
-    "version": "v1.0"
+    "description": "Mockup server base on openAPI vers 3.xx",
+    "version": "1",
+    "title": "Mockup Server | MockyUp",
+    "termsOfService": "",
+    "contact": {
+      "email": "sulaimanfahmi@gmail.com"
+    }
   },
   "servers": [
     {
-      "url": "http://{host}/mocks/mocking/{testing_path}?path="
+      "url": "http://{host}/mocks/mocking/{testing_path}?path=",
+      "description": "Testing locally",
+      "variables": {
+        "host": {
+          "default": "localhost:8080"
+        },
+        "testing_path": {
+          "description": "testing id path",
+          "default": "5e3aa62f11b5dc7e1bfaa1d6"
+        }
+      }
     }
   ],
   "paths": {
-    "/v1/auth/genreateOtp": {
+    "/api/login": {
       "post": {
-        "responses": {}
-      }
-    },
-    "/v1/auth/dologin": {
-      "post": {
+        "summary": "",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CLIENT_ID"
+          },
+          {
+            "$ref": "#/components/parameters/CLIENT_SECRET"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/USER_LOGIN"
+                "$ref": "#/components/schemas/LOGIN_REQUEST"
               }
             }
           }
@@ -32,7 +51,68 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/USER_LOGIN_RESPONSE"
+                  "$ref": "#/components/schemas/LOGIN_RESPONSE"
+                },
+                "examples": {
+                  "LOGIN_SUCCESS": {
+                    "$ref": "#/components/examples/LOGIN_SUCCESS"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-examples": {
+          "x-body-including": [
+            {
+              "property": {
+                "name": "email",
+                "value": null
+              },
+              "response": {
+                "httpCode": 400,
+                "response": {
+                  "message": "email is required",
+                  "code": "123321"
+                }
+              }
+            }
+          ],
+          "x-header-including": [
+            {
+              "property": {
+                "name": "client-id",
+                "value": null
+              },
+              "response": {
+                "httpCode": 403,
+                "response": {
+                  "message": "invalid access permission"
+                }
+              }
+            },
+            {
+              "property": {
+                "name": "secret",
+                "value": null
+              },
+              "response": {
+                "httpCode": 403,
+                "response": {
+                  "message": "invalid access permission"
+                }
+              }
+            }
+          ],
+          "x-default": {
+            "response": {
+              "httpCode": 200,
+              "headers": {
+                "x-request-id": "123"
+              },
+              "content": {
+                "application/json": {
+                  "$ref": "#/components/examples/LOGIN_SUCCESS"
                 }
               }
             }
@@ -40,41 +120,264 @@
         }
       }
     },
-    "/v1/auth/validateAuth": {
+    "/api/profile": {
       "get": {
-        "parameters": [
+        "summary": "",
+        "security": [
           {
-            "name": "Authorization",
-            "in": "header",
-            "required": true
+            "BearerAuth": []
           }
         ],
-        "responses": {}
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CLIENT_ID"
+          },
+          {
+            "$ref": "#/components/parameters/CLIENT_SECRET"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PROFILE_RESPONSE"
+                },
+                "examples": {
+                  "PROFILE_RESPONSE": {
+                    "$ref": "#/components/examples/PROFILE_RESPONSE"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-examples": {
+          "x-header-including": [
+            {
+              "property": {
+                "name": "client-id",
+                "value": null
+              },
+              "response": {
+                "httpCode": 403,
+                "response": {
+                  "message": "invalid access permission"
+                }
+              }
+            },
+            {
+              "property": {
+                "name": "secret",
+                "value": null
+              },
+              "response": {
+                "httpCode": 403,
+                "response": {
+                  "message": "invalid access permission"
+                }
+              }
+            }
+          ],
+          "x-default": {
+            "response": {
+              "httpCode": 200,
+              "headers": {
+                "x-request-id": "123"
+              },
+              "content": {
+                "application/json": {
+                  "$ref": "#/components/examples/PROFILE_RESPONSE"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/books": {
+      "get": {
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CLIENT_ID"
+          },
+          {
+            "$ref": "#/components/parameters/CLIENT_SECRET"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BOOKS_LIST_RESPONSE"
+                }
+              }
+            }
+          }
+        },
+        "x-examples": {
+          "x-header-including": [
+            {
+              "property": {
+                "name": "client-id",
+                "value": null
+              },
+              "response": {
+                "httpCode": 403,
+                "response": {
+                  "message": "invalid access permission"
+                }
+              }
+            },
+            {
+              "property": {
+                "name": "secret",
+                "value": null
+              },
+              "response": {
+                "httpCode": 403,
+                "response": {
+                  "message": "invalid access permission"
+                }
+              }
+            }
+          ],
+          "x-default": {
+            "response": {
+              "httpCode": 200,
+              "headers": {
+                "x-request-id": "123"
+              },
+              "content": {
+                "application/json": {
+                  "$ref": "#/components/examples/BOOKS_LIST_RESPONSE"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/books/{id}": {
+      "get": {
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CLIENT_ID"
+          },
+          {
+            "$ref": "#/components/parameters/CLIENT_SECRET"
+          },
+          {
+            "$ref": "#/components/parameters/DATA_ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BOOKS"
+                }
+              }
+            }
+          }
+        },
+        "x-examples": {
+          "x-header-including": [
+            {
+              "property": {
+                "name": "client-id",
+                "value": null
+              },
+              "response": {
+                "httpCode": 403,
+                "response": {
+                  "message": "invalid access permission"
+                }
+              }
+            },
+            {
+              "property": {
+                "name": "secret",
+                "value": null
+              },
+              "response": {
+                "httpCode": 403,
+                "response": {
+                  "message": "invalid access permission"
+                }
+              }
+            }
+          ],
+          "x-path-including": [
+            {
+              "property": {
+                "name": "id",
+                "value": 1
+              },
+              "response": {
+                "httpCode": 403,
+                "response": {
+                  "message": "invalid access permission"
+                }
+              }
+            },
+            {
+              "property": {
+                "name": "id",
+                "value": 2
+              },
+              "response": {
+                "httpCode": 200,
+                "content": {
+                  "application/json": {
+                    "$ref": "#/components/examples/BOOK"
+                  }
+                }
+              }
+            }
+          ],
+          "x-default": {
+            "response": {
+              "httpCode": 200,
+              "headers": {
+                "x-request-id": "123"
+              },
+              "content": {
+                "application/json": {
+                  "$ref": "#/components/examples/BOOKS_LIST_RESPONSE"
+                }
+              }
+            }
+          }
+        }
       }
     }
   },
   "components": {
     "schemas": {
-      "GENERATE_OTP": {
+      "LOGIN_REQUEST": {
         "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
         "properties": {
-          "phoneNumber": {
-            "type": "string"
-          }
-        }
-      },
-      "OTP_RESPONSE": {
-        "type": "object",
-        "properties": {
-          "refId": {
-            "type": "string"
-          }
-        }
-      },
-      "USER_LOGIN": {
-        "type": "object",
-        "properties": {
-          "username": {
+          "email": {
             "type": "string"
           },
           "password": {
@@ -82,185 +385,174 @@
           }
         }
       },
-      "USER_LOGIN_RESPONSE": {
+      "LOGIN_RESPONSE": {
         "type": "object",
-        "required": [
-          "token",
-          "id"
-        ],
         "properties": {
-          "token": {
+          "accessToken": {
             "type": "string"
           },
+          "username": {
+            "type": "string"
+          },
+          "accessList": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "PROFILE_RESPONSE": {
+        "type": "object",
+        "properties": {
           "id": {
             "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "fullName": {
+            "type": "string"
           }
+        }
+      },
+      "BOOKS": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "title": {
+            "type": "string"
+          },
+          "author": {
+            "type": "string"
+          },
+          "category": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "publisher": {
+            "type": "string"
+          },
+          "publishedDate": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "BOOKS_LIST_RESPONSE": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/BOOKS"
         }
       }
     },
-    "x-coffee": {
-      "env": {
-        "$ref": "#/servers[0]"
-      },
-      "DOGENRATEOTP": {
-        "def": [
-          {
-            "load": "/home/usr/fahmi/node.js",
-            "prepareArguments": [
-              {
-                "run": "randomPhoneNumber()",
-                "as": "$phonenumber"
-              }
-            ]
-          }
-        ],
-        "arguments": {
-          "$phonenumber": {
-            "type": "string",
-            "value": "085782390141",
-            "from": {
-              "def": "$phonenumber"
-            }
-          }
-        },
-        "do": {
-          "$ref": "#/path/v1/generateOtp"
-        },
-        "given": {
-          "parameters": {},
-          "requestBody": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GENERATE_OTP",
-                  "value": {
-                    "phoneNumber": "$phoneNumber"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "expect": {
-          "content": {
-            "application/json": {
-              "httpCode": 200,
-              "response": {
-                "$ref": "#/components/schemas/USER_LOGIN_RESPONSE",
-                "expectValue": {
-                  "USER_LOGIN_RESPONSE.userId": {
-                    "type": "string",
-                    "value": "123321"
-                  }
-                }
-              }
-            }
-          }
+    "parameters": {
+      "CLIENT_ID": {
+        "name": "client-id",
+        "in": "header",
+        "required": true,
+        "schema": {
+          "type": "string"
         }
       },
-      "DOLOGIN": {
-        "arguments": {
-          "schema": {
-            "properties": {
-              "$reffId": {
-                "type": "string"
-              },
-              "$username": {
-                "type": "string"
-              },
-              "$password": {
-                "type": "string"
-              }
-            }
-          }
-        },
-        "do": {
-          "$ref": "#/paths/v1/auth/dologin"
-        },
-        "given": {
-          "parameters": {
-            "Authorization": {
-              "set": "client-123",
-              "in": "header"
-            }
-          },
-          "requestbody": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/USER_LOGIN",
-                  "value": {
-                    "otp": "arguments.$reffId",
-                    "username": "arguments.$username",
-                    "password": "arguments.$password"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "expect": {
-          "content": {
-            "application/json": {
-              "httpCode": 200,
-              "response": {
-                "$ref": "#/component/schemas/USER_LOGIN_RESPONSE"
-              }
-            }
-          }
+      "CLIENT_SECRET": {
+        "name": "secret",
+        "in": "header",
+        "required": true,
+        "schema": {
+          "type": "string"
         }
       },
-      "DOVALIDATE_AUTH": {
-        "before": {
-          "step": {
-            "DOOTP": {
-              "$ref": "#/component/x-coffee/DOGENRATEOTP",
-              "take": {
-                "reffId": "#/component/schemas/OTP_RESPONSE#$reffId"
-              }
+      "DATA_ID": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "number"
+        }
+      }
+    },
+    "examples": {
+      "LOGIN_SUCCESS": {
+        "value": {
+          "accessToken": "123321",
+          "username": "fahmi sulaiman",
+          "accessList": [
+            "READ",
+            "WRITE"
+          ],
+          "books": [
+            {
+              "id": 1,
+              "title": "something1",
+              "author": "string",
+              "category": [
+                "string"
+              ],
+              "publisher": "string",
+              "publishedDate": "2020-10-10T14:51:46.311Z"
             },
-            "DOLOGIN": {
-              "arguments": {
-                "schema": {
-                  "properties": {
-                    "$reffId": {
-                      "type": "string",
-                      "$ref": "DOOTP.$reffId"
-                    }
-                  }
-                }
-              },
-              "$ref": "#/components/x-coffee/DOLOGIN#post",
-              "take": {
-                "token": "#/component/schemas/USER_LOGIN_RESPONSE#token"
-              }
+            {
+              "id": 2,
+              "title": "something2",
+              "author": "string",
+              "category": [
+                "string"
+              ],
+              "publisher": "string",
+              "publishedDate": "2020-10-10T14:51:46.311Z"
             }
-          }
-        },
-        "request": {
-          "$ref": "#/paths/v1/auth/validateAuth"
-        },
-        "given": {
-          "parameters": {
-            "Authorization": {
-              "set": {
-                "$ref": "DOLOGIN.$token"
-              },
-              "prefix": "Bearer ",
-              "in": "header"
-            }
-          }
-        },
-        "expect": {
-          "content": {
-            "application/json": {
-              "httpCode": 200,
-              "response": {
-                "$ref": "#/component/schemas/USER_LOGIN_RESPONSE"
-              }
-            }
-          }
+          ]
         }
+      },
+      "PROFILE_RESPONSE": {
+        "value": {
+          "id": "123",
+          "username": "root",
+          "email": "sulaimanfahmi@gmail.com",
+          "fullName": "fahmi sulaiman"
+        }
+      },
+      "BOOKS_LIST_RESPONSE": {
+        "value": [
+          {
+            "id": 1,
+            "title": "string",
+            "author": "string",
+            "category": [
+              "string"
+            ],
+            "publisher": "string",
+            "publishedDate": "2020-10-10T14:51:46.311Z"
+          }
+        ]
+      },
+      "BOOK": {
+        "value": {
+          "id": 1,
+          "title": "string",
+          "author": "string",
+          "category": [
+            "string"
+          ],
+          "publisher": "string",
+          "publishedDate": "2020-10-10T14:51:46.311Z"
+        }
+      }
+    },
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
       }
     }
   }

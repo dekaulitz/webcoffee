@@ -47,8 +47,9 @@ public class RequestBuilder {
   }
 
   public void createRequest() {
-    requestSpecification.given()
-        .log().all();
+    requestSpecification.given();
+//        .log().all()
+
     if (parameters.size() != 0) {
       parameters.forEach(parameter -> {
         String value = "";
