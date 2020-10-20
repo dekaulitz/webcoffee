@@ -1,5 +1,7 @@
 package com.github.dekaulitz.webcoffee.modules.openapi.parameters;
 
+import com.github.dekaulitz.webcoffee.modules.openapi.ParameterFrom;
+
 public class Parameter extends io.swagger.v3.oas.models.parameters.Parameter {
 
   protected String value;

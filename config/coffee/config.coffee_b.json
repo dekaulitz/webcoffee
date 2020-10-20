@@ -160,7 +160,7 @@
         }
       ]
     },
-    "GET_BOOK_DETAIL_FROM_POST_BOOKS": {
+    "POST_BOOK": {
       "pathItem": {
         "$ref": "resources#auth#paths#/api/books/{id}#get"
       },
@@ -192,41 +192,7 @@
         {
           "name": "id",
           "in": "path",
-          "from": {
-            "$ref": "specs#POST_BOOK",
-            "value": "id"
-          }
-        }
-      ]
-    },
-    "POST_BOOK": {
-      "pathItem": {
-        "$ref": "resources#auth#paths#/api/books#post"
-      },
-      "parameters": [
-        {
-          "name": "accept",
-          "in": "headers",
-          "value": "application/json"
-        },
-        {
-          "name": "client-id",
-          "in": "headers",
-          "argument": "$clientId"
-        },
-        {
-          "name": "Authorization",
-          "in": "headers",
-          "prefix": "Bearer ",
-          "from": {
-            "$ref": "specs#REQUEST_LOGIN",
-            "value": "accessToken"
-          }
-        },
-        {
-          "name": "secret",
-          "in": "headers",
-          "argument": "$secret"
+          "value": 2
         }
       ],
       "requestBody": {
@@ -250,13 +216,12 @@
             },
             "category": {
               "type": "array",
-              "value": [
-                {
-                  "userId": "fahmi.sulaima"
-                }
-              ],
               "items": {
-                "type": "string"
+                "type": "string",
+                "value": [
+                  "test",
+                  "test"
+                ]
               }
             },
             "publisher": {
@@ -264,79 +229,7 @@
             },
             "publishedDate": {
               "type": "string",
-              "argument": "$dateNow"
-            }
-          }
-        }
-      }
-    },
-    "POST_BORROW_BOOK": {
-      "pathItem": {
-        "$ref": "resources#auth#paths#/api/books/borrow#post"
-      },
-      "parameters": [
-        {
-          "name": "accept",
-          "in": "headers",
-          "value": "application/json"
-        },
-        {
-          "name": "client-id",
-          "in": "headers",
-          "argument": "$clientId"
-        },
-        {
-          "name": "Authorization",
-          "in": "headers",
-          "prefix": "Bearer ",
-          "from": {
-            "$ref": "specs#REQUEST_LOGIN",
-            "value": "accessToken"
-          }
-        },
-        {
-          "name": "secret",
-          "in": "headers",
-          "argument": "$secret"
-        }
-      ],
-      "requestBody": {
-        "mediaType": "application/json",
-        "$ref": "resources#auth#components#schemas#BORROW_BOOKS_REQUEST",
-        "payload": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "integer"
-            },
-            "user": {
-              "type": "object",
-              "properties": {
-                "id": {
-                  "type": "string",
-                  "from": {
-                    "$ref": "specs#GET_PROFILE",
-                    "value": "id"
-                  }
-                },
-                "username": {
-                  "type": "string",
-                  "from": {
-                    "$ref": "specs#GET_PROFILE",
-                    "value": "username"
-                  }
-                }
-              }
-            },
-            "borrow_start": {
-              "type": "string",
-              "format": "date-time",
-              "argument": "$dateNow"
-            },
-            "borrow_end": {
-              "type": "string",
-              "format": "date-time",
-              "argument": "$dateNow"
+              "format": "date-time"
             }
           }
         }
@@ -362,90 +255,43 @@
       "$secret": {
         "src": "/Users/dekaulitz/projects/webcoffee/config/scripts/scripts.js",
         "lang": "js"
-      },
-      "$dateNow": {
-        "src": "/Users/dekaulitz/projects/webcoffee/config/scripts/scripts.js",
-        "lang": "js"
       }
     },
     "coffeeTest": {
-      "DO_LOGIN_AND_POST_BOOK": {
-        "order": 2,
+      "DO_LOGIN_AND_GET_BOOK_DETAIL": {
+        "order": 1,
         "do": {
           "$ref": "specs#REQUEST_LOGIN",
           "then": {
             "expect": {
-              "httpStatus": "200",
-              "do": {
-                "$ref": "specs#POST_BOOK",
-                "then": {
-                  "expect": {
-                    "httpStatus": "200",
-                    "response": {
-                      "expectedValue": {
-                        "$.author": {
-                          "type": "string",
-                          "value": "string"
-                        },
-                        "$.id": {
-                          "type": "integer",
-                          "value": "1"
-                        }
-                      },
-                      "schema": {
-                        "type": "object",
-                        "properties": {
-                          "id": {
-                            "type": "integer"
-                          },
-                          "author": {
-                            "type": "string"
-                          },
-                          "category": {
-                            "type": "array",
-                            "items": {
-                              "type": "string"
-                            }
-                          }
-                        }
-                      }
-                    },
-                    "do": {
-                      "$ref": "specs#GET_BOOK_DETAIL_FROM_POST_BOOKS",
-                      "then": {
-                        "expect": {
-                          "httpStatus": "200",
-                          "response": {
-                            "expectedValue": {
-                              "$.author": {
-                                "type": "string",
-                                "value": "string"
-                              },
-                              "$.id": {
-                                "type": "integer",
-                                "value": "1"
-                              }
-                            },
-                            "schema": {
-                              "type": "object",
-                              "properties": {
-                                "id": {
-                                  "type": "integer"
-                                },
-                                "author": {
-                                  "type": "string"
-                                },
-                                "category": {
-                                  "type": "array",
-                                  "items": {
-                                    "type": "string"
-                                  }
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
+              "httpStatus": 200,
+              "parameters": [
+                {
+                  "name": "x-request-id",
+                  "in": "header",
+                  "required": true
+                },
+                {
+                  "name": "x-limiting",
+                  "in": "header",
+                  "argument": "$limiting"
+                }
+              ],
+              "response": {
+                "expectedValue": {
+                  "accessToken": {
+                    "type": "string",
+                    "value": "123321"
+                  }
+                },
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "accessToken"
+                  ],
+                  "properties": {
+                    "accessToken": {
+                      "type": "string"
                     }
                   }
                 }
@@ -454,7 +300,8 @@
           }
         }
       },
-      "DO_LOGIN_AND_GET_PROFILE_AND_BORROW_BOOK": {
+      "DO_LOGIN_AND_GET_PROFILE": {
+        "order": 2,
         "do": {
           "$ref": "specs#REQUEST_LOGIN",
           "then": {
@@ -484,12 +331,95 @@
                           }
                         }
                       }
-                    },
-                    "do": {
-                      "$ref": "specs#POST_BORROW_BOOK",
-                      "then": {
-                        "expect": {
-                          "httpStatus": 200
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "DO_LOGIN_AND_GET_LIST_OF_BOOKS": {
+        "order": 2,
+        "do": {
+          "$ref": "specs#REQUEST_LOGIN",
+          "then": {
+            "expect": {
+              "httpStatus": "200",
+              "do": {
+                "$ref": "specs#GET_LIST_BOOKS",
+                "then": {
+                  "expect": {
+                    "httpStatus": "200",
+                    "response": {
+                      "expectedValue": {
+                        "$.0.author": {
+                          "type": "string",
+                          "value": "string"
+                        }
+                      },
+                      "schema": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "integer"
+                            },
+                            "author": {
+                              "type": "string"
+                            },
+                            "category": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "DO_LOGIN_AND_POST_BOOK": {
+        "order": 2,
+        "do": {
+          "$ref": "specs#REQUEST_LOGIN",
+          "then": {
+            "expect": {
+              "httpStatus": "200",
+              "do": {
+                "$ref": "specs#POST_BOOK",
+                "then": {
+                  "expect": {
+                    "httpStatus": "200",
+                    "response": {
+                      "expectedValue": {
+                        "$.author": {
+                          "type": "string",
+                          "value": "string"
+                        }
+                      },
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer"
+                          },
+                          "author": {
+                            "type": "string"
+                          },
+                          "category": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
                         }
                       }
                     }

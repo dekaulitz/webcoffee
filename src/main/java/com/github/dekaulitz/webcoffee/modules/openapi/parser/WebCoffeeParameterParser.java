@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.dekaulitz.webcoffee.modules.openapi.parameters.CookieParameter;
 import com.github.dekaulitz.webcoffee.modules.openapi.parameters.HeaderParameter;
 import com.github.dekaulitz.webcoffee.modules.openapi.parameters.Parameter;
-import com.github.dekaulitz.webcoffee.modules.openapi.parameters.ParameterFrom;
+import com.github.dekaulitz.webcoffee.modules.openapi.ParameterFrom;
 import com.github.dekaulitz.webcoffee.modules.openapi.parameters.PathParameter;
 import com.github.dekaulitz.webcoffee.modules.openapi.parameters.QueryParameter;
 import java.util.HashSet;

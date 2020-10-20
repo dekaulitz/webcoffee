@@ -33,8 +33,8 @@ public class AssertionsGuardian {
 
 
   public void validate() {
-    assertEquals(expect.getHttpStatus(),response.getStatusCode(),
-        this.endpoint + "expect httpStatusCode " + expect.getHttpStatus());
+    assertEquals(expect.getHttpStatus(), response.getStatusCode(),
+        this.endpoint + " expect httpStatusCode " + expect.getHttpStatus());
     this.validateHeaders();
     if (expect.getResponse() != null) {
       JsonNode responseNode = response.getBody().as(JsonNode.class);
@@ -64,8 +64,12 @@ public class AssertionsGuardian {
         if (n < fieldArray.length) {
           if (StringUtils.isNumeric(key)) {
             expect = expect.get(Integer.parseInt(key));
+            assertNotNull(expect,
+                this.endpoint + " invalid field " + s + " not found");
           } else if (!key.equalsIgnoreCase("$")) {
             expect = expect.get(key);
+            assertNotNull(expect,
+                this.endpoint + " invalid field " + s + " not found");
           }
           n++;
         }
@@ -76,13 +80,14 @@ public class AssertionsGuardian {
 
   private void validateResponseType(JsonNode node, Schema expectSchema) {
     if (expectSchema instanceof StringSchema) {
-      assertTrue(node.isTextual(), this.endpoint + " expecting "+node+" response is string");
+      assertTrue(node.isTextual(), this.endpoint + " expecting " + node + " response is string");
     } else if (expectSchema instanceof IntegerSchema) {
-      assertTrue(node.isIntegralNumber(), this.endpoint + " expecting "+node+" response is integer");
+      assertTrue(node.isIntegralNumber(),
+          this.endpoint + " expecting " + node + " response is integer");
     } else if (expectSchema instanceof BooleanSchema) {
-      assertTrue(node.asBoolean(), this.endpoint + " expecting response "+node+" is boolean");
+      assertTrue(node.asBoolean(), this.endpoint + " expecting response " + node + " is boolean");
     } else if (expectSchema instanceof ArraySchema) {
-      assertTrue(node.isArray(), this.endpoint + " expecting response "+node+" is array");
+      assertTrue(node.isArray(), this.endpoint + " expecting response " + node + " is array");
       //taking sample from the first response assuming the rest of structure remain same
       validateResponseType(node.get(0), ((ArraySchema) expectSchema).getItems());
     } else {
@@ -102,7 +107,7 @@ public class AssertionsGuardian {
         assertTrue(node.isTextual(), this.endpoint + " expecting " + key + " is string");
         if (((StringSchema) schema).getValue() != null) {
           assertEquals(((StringSchema) schema).getValue(), node.asText(),
-              this.endpoint + "expecting " + key + " is " + ((StringSchema) schema).getValue());
+              this.endpoint + " expecting " + key + " is " + ((StringSchema) schema).getValue());
         }
       } else {
         assertTrue(node.get(key).isTextual(), this.endpoint + " expecting " + key + " is string");

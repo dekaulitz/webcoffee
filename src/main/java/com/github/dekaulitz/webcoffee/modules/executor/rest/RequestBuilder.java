@@ -47,8 +47,8 @@ public class RequestBuilder {
   }
 
   public void createRequest() {
-    requestSpecification.given();
-//        .log().all()
+    requestSpecification.given()
+        .log().all();
 
     if (parameters.size() != 0) {
       parameters.forEach(parameter -> {
@@ -84,19 +84,39 @@ public class RequestBuilder {
       Map<String, Object> body = new HashMap<>();
       Map<String, WebCoffeeSchema<?>> payload = requestBody.getPayload().getProperties();
       for (Map.Entry<String, WebCoffeeSchema<?>> entry : payload.entrySet()) {
-        Object value = "";
-        if (entry.getValue().getValue() != null) {
-          value = entry.getValue().getValue();
-        } else {
-          if (entry.getValue().getArgument() != null) {
-            value = ExecutorHelper
-                .getArgumentValue(entry.getValue().getArgument(), globalArguments, arguments);
-          }
-        }
+        Object value = renderingRequestBody(entry.getValue());
         body.put(entry.getKey(), value);
       }
       this.requestSpecification.body(body);
     }
+  }
+
+  private Object renderingRequestBody(WebCoffeeSchema entry) {
+    Object value = "";
+    if (entry.getType().equalsIgnoreCase("object")) {
+      Map<String, Object> body = new HashMap<>();
+      //@TODO find a big deal when the requestbody is object
+      Map<String, WebCoffeeSchema<?>> payload = entry.getProperties();
+      for (Map.Entry<String, WebCoffeeSchema<?>> entryProperty : payload.entrySet()) {
+        Object valueProp = renderingRequestBody(entryProperty.getValue());
+        body.put(entryProperty.getKey(), valueProp);
+      }
+      value = body;
+    } else if (entry.getFrom() != null) {
+      JsonNode globalResponseRef = globalResponse
+          .get(entry.getFrom().get$ref());
+      if (globalResponseRef != null) {
+        value = globalResponseRef.get(entry.getFrom().getValue()).asText();
+      }
+    } else if (entry.getValue() != null) {
+      value = entry.getValue();
+    } else {
+      if (entry.getArgument() != null) {
+        value = ExecutorHelper
+            .getArgumentValue(entry.getArgument(), globalArguments, arguments);
+      }
+    }
+    return value;
   }
 
   public RequestBuilder execute() {

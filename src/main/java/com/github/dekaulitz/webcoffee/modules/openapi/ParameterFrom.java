@@ -1,4 +1,4 @@
-package com.github.dekaulitz.webcoffee.modules.openapi.parameters;
+package com.github.dekaulitz.webcoffee.modules.openapi;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

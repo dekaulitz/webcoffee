@@ -3,6 +3,7 @@ package com.github.dekaulitz.webcoffee.modules.openapi.parser;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.dekaulitz.webcoffee.modules.openapi.ParameterFrom;
 import com.github.dekaulitz.webcoffee.modules.openapi.schemas.ArraySchema;
 import com.github.dekaulitz.webcoffee.modules.openapi.schemas.BooleanSchema;
 import com.github.dekaulitz.webcoffee.modules.openapi.schemas.IntegerSchema;
@@ -68,8 +69,6 @@ public class WebCoffeeSchemaParser extends SchemaTypeUtil {
       }
     } else if (NUMBER_TYPE.equals(type)) {
       webCoffeeSchema = new NumberSchema();
-      final String value = NodeHelper.getNodeString(node, VALUE, false);
-      webCoffeeSchema.setValue(value);
       if (!StringUtils.isBlank(format)) {
         webCoffeeSchema.setFormat(format);
       }
@@ -82,6 +81,8 @@ public class WebCoffeeSchemaParser extends SchemaTypeUtil {
       }
     } else if (ARRAY_TYPE.equals(type)) {
       webCoffeeSchema = new ArraySchema();
+      final Object value = NodeHelper.getGenericNode(node, VALUE);
+      webCoffeeSchema.setValue(value);
       ObjectNode item = NodeHelper.getObjectNode(node, "items", false);
       if (item != null) {
         webCoffeeSchema.setItems(createSchemaFromNode(item));
@@ -112,10 +113,19 @@ public class WebCoffeeSchemaParser extends SchemaTypeUtil {
     if (node.get("maxItems") != null) {
       webCoffeeSchema.setMaxItems(NodeHelper.getNodeInteger(node, "maxItems", false));
     }
+
     webCoffeeSchema.setType(type);
     webCoffeeSchema.set$refValue(refValue);
-    webCoffeeSchema.set$refValue(refValue);
     webCoffeeSchema.setArgument(argumentValue);
+    ObjectNode parameterFromExists = NodeHelper.getObjectNode(node, "from", false);
+    if (parameterFromExists != null) {
+      ParameterFrom parameterFrom = new ParameterFrom();
+      parameterFrom
+          .set$ref(NodeHelper.getNodeString((ObjectNode) parameterFromExists, "$ref", false));
+      parameterFrom.setValue(
+          NodeHelper.getNodeString((ObjectNode) parameterFromExists, "value", false));
+      webCoffeeSchema.setFrom(parameterFrom);
+    }
     return webCoffeeSchema;
   }
 }

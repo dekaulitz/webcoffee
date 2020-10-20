@@ -18,6 +18,9 @@ var $clientId = function () {
 var $limiting = function () {
   return "123"
 }
+var $dateNow = function () {
+  return new Date().toDateString();
+}
 
 var $secret = function () {
   return randomString(25)

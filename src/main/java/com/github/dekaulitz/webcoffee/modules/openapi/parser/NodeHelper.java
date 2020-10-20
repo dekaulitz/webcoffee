@@ -26,6 +26,10 @@ public class NodeHelper {
     return result;
   }
 
+  public static Object getGenericNode(JsonNode jsonNode, String key) {
+    return jsonNode.get(key);
+  }
+
   public static ArrayNode getArrayNode(JsonNode jsonNode, String key, Boolean required) {
     ArrayNode result = (ArrayNode) jsonNode.get(key);
     isRequired(result, key, required);

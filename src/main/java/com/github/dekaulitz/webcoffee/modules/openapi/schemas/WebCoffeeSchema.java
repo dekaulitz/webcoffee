@@ -1,9 +1,11 @@
 package com.github.dekaulitz.webcoffee.modules.openapi.schemas;
 
 
+import com.github.dekaulitz.webcoffee.modules.openapi.ParameterFrom;
 import io.swagger.v3.oas.models.media.Schema;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class WebCoffeeSchema<T> extends Schema<T> {
 
@@ -12,6 +14,16 @@ public class WebCoffeeSchema<T> extends Schema<T> {
   protected String argument;
   protected WebCoffeeSchema<?> items = null;
   protected List<String> required = new ArrayList<>();
+  protected ParameterFrom from;
+  private Map<String, WebCoffeeSchema<?>> properties = null;
+
+  public ParameterFrom getFrom() {
+    return from;
+  }
+
+  public void setFrom(ParameterFrom from) {
+    this.from = from;
+  }
 
   @Override
   public List<String> getRequired() {

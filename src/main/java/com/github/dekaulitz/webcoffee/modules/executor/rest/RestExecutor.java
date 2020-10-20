@@ -68,7 +68,7 @@ public class RestExecutor implements CoffeeExecutor {
     requestBuilder.execute();
     Response response = requestBuilder
         .getValidateResponse()
-//        .log().all()
+        .log().all()
         .extract().response();
     JsonNode responseNode = response.getBody().as(JsonNode.class);
     globalResponse.put(webCoffeeDoRequest.get$ref(), responseNode);
